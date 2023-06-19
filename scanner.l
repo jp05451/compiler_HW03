@@ -86,7 +86,7 @@ else            {token(ELSE);}
 end             {token(END);}
 exit            {token(EXIT);}
 false           {
-                yylval.info.dType=TYPE_BOOL;
+                yylval.info.dType=type_bool;
                 yylval.info.boolValue=false;
                 token(FALSE);
                 }
@@ -115,8 +115,7 @@ string          {
                 }
 then            {token(THEN);}
 true            {
-                // strcpy(yylval.dType,"true");
-                yylval.info.dType=TYPE_BOOL;
+                yylval.info.dType=type_bool;
                 yylval.info.boolValue=true;
                 token(TRUE);
                 }
@@ -126,25 +125,24 @@ when            {token(WHEN);}
 
         /*==========Identity==========*/
 {ID}            {
-                sprintf(yylval.dataIdentity,"%s",yytext);
+                sprintf(yylval.info.tokenID,"%s",yytext);
+
                 token(ID);
                 }
 
 {integer}       {
                 int intNumber;
                 sscanf(yytext,"%d",&intNumber);
-                // sprintf(yylval.dataIdentity,"%d",intNumber);
-                yylval.dType=type_int;
-                // puts(yylval.dataIdentity);
-                // yylval.dType=type_int;
+                yylval.info.dType=type_int;
+                yylval.info.intValue=intNumber;
                 tokenInteger(INT_NUMBER,intNumber);
 }
 {numerical}     {
                 double doubleNumber;
-                // printf("%s\n",yytext);
                 sscanf(yytext,"%lf",&doubleNumber);
                 printf("%f\n",doubleNumber);
-                yylval.dType=type_real;
+                yylval.info.dType=type_real;
+                yylval.info.doubleValue=doubleNumber;
                 tokenReal(REAL_NUMBER,doubleNumber);
                 }
 
@@ -171,10 +169,9 @@ when            {token(WHEN);}
 <STRING_STATE>\"        {
                         yytext=strTemp;
                         BEGIN(INITIAL);
-                        yylval.dType=type_string;
-                        // strcat(buf,"\"");
+                        yylval.info.dType=type_string;
+                        strcpy(yylval.info.stringValue,strTemp);
                         tokenString(STR,strTemp);
-                        // LIST;
                         }
 
 <STRING_STATE>[^\"]*    {strcat(strTemp,yytext);}

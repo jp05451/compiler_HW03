@@ -13,6 +13,20 @@
 
 using namespace std;
 
+struct tokenInfo
+{
+    char tokenID[256];
+    dataType dType;
+
+    int intValue;
+    double doubleValue;
+    bool boolValue;
+    char stringValue[256];
+
+    bool isArray;
+    bool isFunction;
+};
+
 string typeString[] = {
     "int",
     "real",
@@ -86,7 +100,7 @@ public:
     ~symbolTable() {}
     void creat();
     bool lookup(const string &symbol);
-    void insert(const string, const dataType, master_type, int);
+    void insert(const tokenInfo, int);
     void insertStack(int, int);
     bool canAccess(const string &, int);
     bool funcVarCorrect(string funcName, vector<funcVar> &inputVar);
@@ -107,16 +121,16 @@ bool symbolTable::lookup(const string &symbol)
         return 1;
 }
 
-void symbolTable::insert(const string symbol, const dataType _type, master_type _masterType, int _stackNum)
+void symbolTable::insert(const tokenInfo symbol, const dataType _type, master_type _masterType, int _stackNum)
 {
-    if (lookup(symbol) != 0)
-    {
-        cout << " ERROR: symbolTable insert " << symbol << " redefine" << endl;
-        return;
-    }
-    table[symbol].type = _type;
-    table[symbol].masterType = _masterType;
-    table[symbol].stackNum.push_back(_stackNum);
+    // if (lookup(symbol) != 0)
+    // {
+    //     cout << " ERROR: symbolTable insert " << symbol << " redefine" << endl;
+    //     return;
+    // }
+    table[symbol.tokenID].type = _type;
+    table[symbol.tokenID].masterType = _masterType;
+    table[symbol.tokenID].stackNum.push_back(_stackNum);
     // insertStack(symbol, scopeStack.top(), _stackNum);
     cout << symbol << " is inserted in stack " << _stackNum << endl;
 }

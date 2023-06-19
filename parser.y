@@ -12,31 +12,15 @@ symbolTable s_table;
 int currentStack=0;
 int stackNumber=0;
 
-// typedef struct funcVar
-// {
-//     string varID;
-//     dataType funcVarType;
-//     bool isArray;
-// }
-// funcVar;
 
 vector<funcVar> functionVariable;
 stack<int> scopeStack;
 
 
 
-struct tokenInfo
-{
-    char tokenID[256];
-    dataType dType;
 
-    int intValue;
-    double doubleValue;
-    bool boolValue;
-    char stringValue[256];
-};
 
-fstream javaCode;
+ofstream javaASS;
 %}
 
 
@@ -93,7 +77,7 @@ declaration:    constant
 
 constant:       CONST ID ':' Type ASSIGN expressions
                 {
-                    if($4!=$6)
+                    if($4.info.dType!=$6.info.dType)
                         yyerror("ERROR: const assign type error");
                     else
                         s_table.insert($2,tokenID,intToType($4.dType),is_constant,currentStack);
@@ -101,8 +85,7 @@ constant:       CONST ID ':' Type ASSIGN expressions
                 
                 |CONST ID ASSIGN expressions
                 {
-                    // if($4!=$6)
-                    //     yyerror("ERROR: const assign type error");
+                    
                     s_table.insert($2,intToType($4),is_constant,currentStack);
                 }
                 ;
@@ -330,6 +313,9 @@ simple:         ID ASSIGN expressions
                 |EXIT
                 |EXIT WHEN bool_expression
                 |SKIP
+                {
+
+                }
                 ;
 
 
@@ -465,12 +451,12 @@ bool_expression:    '(' bool_expression ')'             {$$=$2;}
                     {
                     if($1!=$3)
                         yyerror("ERROR:bool_expression 'OR' type error");
-                    $$=type_bool;
+                    $$.info.dType=type_bool;
                     }     
                     ;
 function_invocation:    ID '(' ')' 
                         {
-                            if(s_table.lookup($1)==0)
+                            if(s_table.lookup($1.info.tokenID)==0)
                             {
                                 yyerror("ERROR: function not declare");
                             }
@@ -659,9 +645,15 @@ int main(int argc,char **argv)
         exit(1);
     }
     yyin = fopen(argv[1], "r");         /* open input file */
+    string fileName=argv[1];
+    fileName.replace(fileName.size()-3,3,"");
+    javaASS.open(fileName+".jasm");
+    javaASS<<"class "<<fileName<<"{\nmethod public static void main(java.lang.String[])\nmax_stack 15\n max_locals 15\n{"<<endl;
 
     /* perform parsing */
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
     s_table.dump();
+    javaASS<<"return\n}\n}"<<endl;
+    javaASS.close();
 }
