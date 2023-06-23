@@ -17,10 +17,7 @@ vector<funcVar> functionVariable;
 stack<int> scopeStack;
 
 
-
-
-
-ofstream javaASS;
+ofstream javaASM;
 %}
 
 
@@ -85,8 +82,8 @@ constant:       CONST ID ':' Type ASSIGN expressions
                 
                 |CONST ID ASSIGN expressions
                 {
-                    
-                    s_table.insert($2,intToType($4),is_constant,currentStack);
+                    $2.info.isConst
+                    s_table.insert($2,currentStack);
                 }
                 ;
 
@@ -307,6 +304,9 @@ simple:         ID ASSIGN expressions
 
                 }
                 |PUT expressions
+                {
+                    javaASM<<"  getstatic java.io.PrintStream java.lang.System.out"<<endl;
+                }
                 |GET expressions
                 |RESULT expressions
                 |RETURN
@@ -314,7 +314,7 @@ simple:         ID ASSIGN expressions
                 |EXIT WHEN bool_expression
                 |SKIP
                 {
-
+                    javaASM<<"getstatic java.io.PrintStream java.lang.System.out\ninvokevirtual void java.io.PrintStream.println()"<<endl;
                 }
                 ;
 
@@ -364,7 +364,7 @@ expressions:    '-' expressions %prec NEGATIVE
                 {
                     functionVariable.clear();
                 }
-                |ID '[' INT ']'
+                |ID '[' INT_NUMBER ']'
                 {
                     if(s_table.lookup($1)==0)
                     {
@@ -647,13 +647,13 @@ int main(int argc,char **argv)
     yyin = fopen(argv[1], "r");         /* open input file */
     string fileName=argv[1];
     fileName.replace(fileName.size()-3,3,"");
-    javaASS.open(fileName+".jasm");
-    javaASS<<"class "<<fileName<<"{\nmethod public static void main(java.lang.String[])\nmax_stack 15\n max_locals 15\n{"<<endl;
+    javaASM.open(fileName+".jasm");
+    javaASM<<"class "<<fileName<<"{\nmethod public static void main(java.lang.String[])\nmax_stack 15\n max_locals 15\n{"<<endl;
 
     /* perform parsing */
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
     s_table.dump();
-    javaASS<<"return\n}\n}"<<endl;
-    javaASS.close();
+    javaASM<<"return\n}\n}"<<endl;
+    javaASM.close();
 }
