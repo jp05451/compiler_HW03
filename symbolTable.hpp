@@ -8,23 +8,59 @@
 #include <iostream>
 #include <iomanip>
 #include <stack>
+#include <cstring>
 
 #define MAX_LINE_LENG 256
 
 using namespace std;
 
-struct tokenInfo
+enum dataType
 {
-    char tokenID[256];
+    type_int,
+    type_real,
+    type_string,
+    type_bool,
+    type_array,
+    // funcion
+    type_function,
+    type_null
+
+};
+
+// template<class T>
+class tokenInfo
+{
+public:
+    // token id
+    // char tokenID[256];
+    string tokenID;
     dataType dType;
 
+    // token data
     int intValue;
     double doubleValue;
     bool boolValue;
-    char stringValue[256];
+    string stringValue;
+    // char stringValue[256];
 
+    // token type
     bool isArray;
     bool isFunction;
+    bool isConst;
+    // tokenInfo &operator=(const tokenInfo &b)
+    // {
+
+    //     // strcpy(tokenID, b.tokenID);
+    //     tokenID = b.tokenID;
+    //     dType = b.dType;
+
+    //     intValue = b.intValue;
+    //     doubleValue = b.doubleValue;
+    //     // strcpy(stringValue, b.stringValue);
+    //     //  test = b.test;
+
+    //     return *this;
+    // }
 };
 
 string typeString[] = {
@@ -44,25 +80,15 @@ enum master_type
     is_func
 };
 
-enum dataType
+class funcParameter
 {
-    type_int,
-    type_real,
-    type_string,
-    type_bool,
-    type_array,
-    // funcion
-    type_function,
-    type_null
-
-};
-
-typedef struct funcVar
-{
+public:
     string varID;
     dataType funcVarType;
     bool isArray;
-} funcVar;
+};
+
+//**************************************function **************************************
 
 bool isNumeric(std::string const &str)
 {
@@ -70,6 +96,7 @@ bool isNumeric(std::string const &str)
     while (it != str.end() && std::isdigit(*it))
     {
         it++;
+        
     }
     return !str.empty() && it == str.end();
 }
@@ -84,13 +111,9 @@ public:
 class symbolData
 {
 public:
-    dataType type;
-    master_type masterType;
     vector<int> stackNum;
-
-    string stringVal;
-    double realVal;
-    functionData fData;
+    functionData funcVar;
+    tokenInfo info;
 };
 
 class symbolTable
@@ -100,10 +123,10 @@ public:
     ~symbolTable() {}
     void creat();
     bool lookup(const string &symbol);
-    void insert(const tokenInfo, int);
+    void insert(const tokenInfo symbol, int stackNum);
     void insertStack(int, int);
     bool canAccess(const string &, int);
-    bool funcVarCorrect(string funcName, vector<funcVar> &inputVar);
+    bool funcVarCorrect(string funcName, vector<funcParameter> &inputVar);
     void dump();
     // dataType getType(const string &, bool);
 
@@ -121,18 +144,13 @@ bool symbolTable::lookup(const string &symbol)
         return 1;
 }
 
-void symbolTable::insert(const tokenInfo symbol, const dataType _type, master_type _masterType, int _stackNum)
+void symbolTable::insert(const tokenInfo symbol, int _stackNum)
 {
-    // if (lookup(symbol) != 0)
-    // {
-    //     cout << " ERROR: symbolTable insert " << symbol << " redefine" << endl;
-    //     return;
-    // }
-    table[symbol.tokenID].type = _type;
-    table[symbol.tokenID].masterType = _masterType;
+
+    table[symbol.tokenID].info = symbol;
     table[symbol.tokenID].stackNum.push_back(_stackNum);
     // insertStack(symbol, scopeStack.top(), _stackNum);
-    cout << symbol << " is inserted in stack " << _stackNum << endl;
+    // cout << symbol << " is inserted in stack " << _stackNum << endl;
 }
 
 void symbolTable::insertStack(int lastStack, int currentStack)
@@ -148,7 +166,7 @@ void symbolTable::insertStack(int lastStack, int currentStack)
             if (canBeAccess != eachSymbol.second.stackNum.end())
             {
                 eachSymbol.second.stackNum.push_back(currentStack);
-                cout<<eachSymbol.first <<" can be access at stack "<<currentStack<<endl;
+                cout << eachSymbol.first << " can be access at stack " << currentStack << endl;
             }
         }
     }
@@ -170,24 +188,24 @@ void symbolTable::dump()
     for (auto &a : table)
     {
         cout << a.first << "\t\t";
-        if (a.second.masterType == is_constant)
+        if (a.second.info.isConst)
         {
             cout << "const ";
         }
 
-        else if (a.second.masterType == is_func)
+        if (a.second.info.isFunction)
         {
             cout << "function ";
         }
 
-        else if (a.second.masterType == is_arr)
+        else if (a.second.info.isArray)
         {
             cout << "array ";
         }
         else
             cout << "normal ";
 
-        cout << typeString[a.second.type] << "\t\t";
+        cout << typeString[a.second.info.dType%7] << "\t\t";
         for (auto s : a.second.stackNum)
         {
             cout << s << " ";
@@ -230,21 +248,21 @@ dataType intToType(int number)
     }
 }
 
-bool symbolTable::funcVarCorrect(string funcName, vector<funcVar> &inputVar)
+bool symbolTable::funcVarCorrect(string funcName, vector<funcParameter> &inputVar)
 {
-    if(lookup(funcName)==0)
-    {
-        cout << "ERROR: funcName " << funcName << " undeclare" << endl;
-        return 0;
-    }
-    if(inputVar.size()!=table[funcName].fData.varNumber)
-        return 0;
-    for (int i = 0; i < inputVar.size();i++)
-    {
-        if(table[funcName].fData.functionVar[i]!=inputVar[i].funcVarType)
-            return 0;
-    }
-    return 1;
+    // if (lookup(funcName) == 0)
+    // {
+    //     cout << "ERROR: funcName " << funcName << " undeclare" << endl;
+    //     return 0;
+    // }
+    // if (inputVar.size() != table[funcName].fData.varNumber)
+    //     return 0;
+    // for (int i = 0; i < inputVar.size(); i++)
+    // {
+    //     if (table[funcName].fData.functionVar[i] != inputVar[i].funcVarType)
+    //         return 0;
+    // }
+    // return 1;
 }
 
 #endif

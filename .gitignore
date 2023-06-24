@@ -4,3 +4,4 @@ y.tab.hpp
 lex.yy.cpp
 parser
 y.output
+.vscode/*
