@@ -14,6 +14,8 @@
 
 using namespace std;
 
+
+
 enum dataType
 {
     type_int,
@@ -27,42 +29,6 @@ enum dataType
 
 };
 
-// template<class T>
-class tokenInfo
-{
-public:
-    // token id
-    // char tokenID[256];
-    string tokenID;
-    dataType dType;
-
-    // token data
-    int intValue;
-    double doubleValue;
-    bool boolValue;
-    string stringValue;
-    // char stringValue[256];
-
-    // token type
-    bool isArray;
-    bool isFunction;
-    bool isConst;
-    // tokenInfo &operator=(const tokenInfo &b)
-    // {
-
-    //     // strcpy(tokenID, b.tokenID);
-    //     tokenID = b.tokenID;
-    //     dType = b.dType;
-
-    //     intValue = b.intValue;
-    //     doubleValue = b.doubleValue;
-    //     // strcpy(stringValue, b.stringValue);
-    //     //  test = b.test;
-
-    //     return *this;
-    // }
-};
-
 string typeString[] = {
     "int",
     "real",
@@ -72,23 +38,67 @@ string typeString[] = {
     // function
     "function"};
 
-enum master_type
+// template<class T>
+struct tokenInfo
 {
-    is_normal,
-    is_arr,
-    is_constant,
-    is_func
+
+    // //token id
+    char tokenID[256];
+    // string tokenID;
+    dataType dType;
+
+    // token data
+    int intValue;
+    double doubleValue;
+    int boolValue;
+
+    char stringValue[256];
+
+    // // token type
+    int is_array;
+    int is_function;
+    int is_const;
 };
 
-class funcParameter
+void copyTokenInfo(struct tokenInfo *dest, const struct tokenInfo *src)
+{
+    strcpy(dest->tokenID, src->tokenID);
+    dest->dType = src->dType;
+    dest->intValue = src->intValue;
+    dest->doubleValue = src->doubleValue;
+    dest->boolValue = src->boolValue;
+    strcpy(dest->stringValue, src->stringValue);
+    dest->is_array = src->is_array;
+    dest->is_function = src->is_function;
+    dest->is_const = src->is_const;
+}
+
+// enum master_type
+// {
+//     is_normal,
+//     is_arr,
+//     is_constant,
+//     is_func
+// };
+
+// class funcVar
+// {
+// public:
+//     string varID;
+//     dataType funcVarType;
+//     bool isArray;
+// };
+
+
+class symbolData
 {
 public:
-    string varID;
-    dataType funcVarType;
-    bool isArray;
+    vector<int> stackNum;
+    vector<dataType> funcParameters;
+    tokenInfo info;
 };
 
-//**************************************function **************************************
+// //**************************************function **************************************
 
 bool isNumeric(std::string const &str)
 {
@@ -96,25 +106,10 @@ bool isNumeric(std::string const &str)
     while (it != str.end() && std::isdigit(*it))
     {
         it++;
-        
+
     }
     return !str.empty() && it == str.end();
 }
-
-class functionData
-{
-public:
-    int varNumber = 0;
-    vector<dataType> functionVar;
-};
-
-class symbolData
-{
-public:
-    vector<int> stackNum;
-    functionData funcVar;
-    tokenInfo info;
-};
 
 class symbolTable
 {
@@ -126,7 +121,7 @@ public:
     void insert(const tokenInfo symbol, int stackNum);
     void insertStack(int, int);
     bool canAccess(const string &, int);
-    bool funcVarCorrect(string funcName, vector<funcParameter> &inputVar);
+    bool funcVarCorrect(string funcName, vector<dataType> &inputVar);
     void dump();
     // dataType getType(const string &, bool);
 
@@ -188,17 +183,17 @@ void symbolTable::dump()
     for (auto &a : table)
     {
         cout << a.first << "\t\t";
-        if (a.second.info.isConst)
+        if (a.second.info.is_const)
         {
             cout << "const ";
         }
 
-        if (a.second.info.isFunction)
+        if (a.second.info.is_function)
         {
             cout << "function ";
         }
 
-        else if (a.second.info.isArray)
+        else if (a.second.info.is_array)
         {
             cout << "array ";
         }
@@ -248,21 +243,22 @@ dataType intToType(int number)
     }
 }
 
-bool symbolTable::funcVarCorrect(string funcName, vector<funcParameter> &inputVar)
+bool symbolTable::funcVarCorrect(string funcName, vector<dataType> &inputVar)
 {
-    // if (lookup(funcName) == 0)
-    // {
-    //     cout << "ERROR: funcName " << funcName << " undeclare" << endl;
-    //     return 0;
-    // }
-    // if (inputVar.size() != table[funcName].fData.varNumber)
-    //     return 0;
-    // for (int i = 0; i < inputVar.size(); i++)
-    // {
-    //     if (table[funcName].fData.functionVar[i] != inputVar[i].funcVarType)
-    //         return 0;
-    // }
-    // return 1;
+    if (lookup(funcName) == 0)
+    {
+        cout << "ERROR: funcName " << funcName << " undeclare" << endl;
+        return 0;
+    }
+
+    if (!table[funcName].info.is_function||inputVar.size() != table[funcName].funcParameters.size())
+        return 0;
+    for (int i = 0; i < inputVar.size(); i++)
+    {
+        if (table[funcName].funcParameters[i] != inputVar[i])
+            return 0;
+    }
+    return 1;
 }
 
 #endif

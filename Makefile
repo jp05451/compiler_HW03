@@ -4,7 +4,7 @@
 #
 ##################################################################
 
-scanner: y.tab.cpp lex.yy.cpp
+parser: y.tab.cpp lex.yy.cpp
 	g++ -o parser y.tab.cpp -ll
 
 lex.yy.cpp: scanner.l
