@@ -15,6 +15,7 @@
 using namespace std;
 
 stack<int> scopeStack;
+int javaStackNumber = 0;
 
 enum dataType
 {
@@ -79,8 +80,9 @@ struct tokenInfo
     int is_array;
     int is_function;
     int is_const;
-};
 
+    int javaStackNum;
+};
 
 void copyTokenInfo(tokenInfo &dest, const tokenInfo &src)
 {
@@ -97,6 +99,8 @@ void copyTokenInfo(tokenInfo &dest, const tokenInfo &src)
     dest.is_array = src.is_array;
     dest.is_function = src.is_function;
     dest.is_const = src.is_const;
+
+    dest.javaStackNum = src.javaStackNum;
 }
 
 int compareTokenInfo(const tokenInfo &info1, const tokenInfo &info2)
@@ -118,6 +122,7 @@ void initializeTokenInfo(tokenInfo &info)
     info.is_array = false;        // Initialize is_array with default value
     info.is_function = false;     // Initialize is_function with default value
     info.is_const = false;        // Initialize is_const with default value
+    info.javaStackNum = 0;
 }
 
 // class funcVar
@@ -181,6 +186,7 @@ void symbolTable::insert(const tokenInfo &symbol, int _stackNum)
 
     copyTokenInfo(table[symbol.tokenID].info, symbol);
     table[symbol.tokenID].stackNum.push_back(_stackNum);
+    // table[symbol.tokenID].javaStackNumber = javaStack;
     if (scopeStack.empty())
         insertStack(0, _stackNum);
     else

@@ -213,6 +213,7 @@ when            {token(WHEN);}
         /*==========next line==========*/
 \n      {
         LIST;
+        java<<"/*"<<linenum<<": "<<buf<<"*/"<<endl;
         printf("%d: %s", linenum++, buf);
         buf[0] = '\0';
         }

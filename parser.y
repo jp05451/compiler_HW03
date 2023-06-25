@@ -16,7 +16,9 @@ int stackNumber=0;
 vector<tokenInfo> functionVariable;
 
 
-ofstream javaASM;
+
+ofstream java;
+string className;
 %}
 
 
@@ -30,7 +32,7 @@ ofstream javaASM;
 %token <info> ID INT_NUMBER REAL_NUMBER STR TRUE FALSE
 
 %type <info> expressions array function_invocation functionVarA functionVarB
-%type <info> bool_expression
+%type <info> bool_expression simple
 %type <info> const_exp
 %type <dType> Types Type 
 
@@ -56,6 +58,14 @@ ofstream javaASM;
 %%
 
 program:        declarations statments
+                {
+                    java<<"method public static void main(java.lang.String[])"<<endl;
+                    java<<"max_stack 15"<<endl;
+                    java<<"max_locals 15"<<endl;
+                    java<<"{"<<endl;
+                    java<<"return"<<endl;
+                    java<<"}"<<endl;
+                }
                 ;
 
 declarations:   declarations declaration
@@ -72,6 +82,16 @@ declaration:    constant
                 |function
                 |procedure
                 ;
+
+statment:       block
+                |simple
+                |expressions
+                |function_invocation
+                {
+                    functionVariable.clear();
+                }
+                |conditional
+                |loop
 
 constant:       CONST ID ':' Type ASSIGN expressions
                 {
@@ -100,17 +120,51 @@ variable:       VAR ID ':' Type
                     $2.dType=$4;
                     cout<<$2.dType<<endl;
 
+                    if(currentStack==0)
+                    {
+                        java<<"field static "<<typeString[$4]<<endl;
+                    }
+                    else
+                    {
+                        $2.javaStackNum=javaStackNumber++;
+                    }
                     s_table.insert($2,currentStack);
                 }
-                |VAR ID ASSIGN const_exp
+                |VAR ID ASSIGN expressions
                 {
                     // if($4!=$6)
                     //     yyerror("ERROR: var assign type error");
                     $2.dType=$4.dType;
                     $2.value=$4.value;
+                    
+                    if(currentStack==0)
+                    {
+                        if($4.dType==type_int)
+                            java<<"field static "<<typeString[$4.dType]<<" = "<< $4.value.intValue <<endl;
+                        else if($4.dType==type_bool)
+                            java<<"field static "<<typeString[$4.dType]<<" = "<< $4.value.boolValue <<endl;
+                        $2.javaStackNum=0;
+                    }
+                    else
+                    {
+                        $2.javaStackNum=javaStackNumber++;
+                        if($4.is_const)
+                        {
+                            if($4.dType=type_int)
+                            {
+                                java<<"sipush "<<$4.value.intValue<<endl;
+                            }
+                            else if($4.dType=type_bool)
+                            {
+                                java<<"iconst_"<<$4.value.boolValue<<endl;
+                            }
+                        }
+                        java<<"istore "<<javaStackNumber-1<<endl;
+                    }
                     s_table.insert($2,currentStack);
+
                 }
-                |VAR ID ':' Type ASSIGN const_exp
+                |VAR ID ':' Type ASSIGN expressions
                 {
                     if($4!=$6.dType)
                         yyerror("ERROR: const assign type error");
@@ -118,6 +172,28 @@ variable:       VAR ID ':' Type
                     {
                         $2.dType=$4;
                         $2.value=$6.value;
+                        if(currentStack==0)
+                        {
+                            if($4==type_int)
+                                java<<"field static "<<typeString[$4]<<" = "<< $6.value.intValue <<endl;
+                            else if($4==type_bool)
+                                java<<"field static "<<typeString[$4]<<" = "<< $6.value.boolValue <<endl;
+                            $2.javaStackNum=0;
+                        }
+                        else
+                        {
+                            $2.javaStackNum=javaStackNumber++;
+                            if($6.is_const)
+                            {
+                                if($6.dType=type_int)
+                                    java<<"sipush "<<$6.value.intValue<<endl;
+                                else if($6.dType=type_bool)
+                                {
+                                    java<<"iconst_"<<$6.value.boolValue<<endl;
+                                }
+                            }
+                            java<<"istore "<<javaStackNumber-1<<endl;
+                        }
                         s_table.insert($2,currentStack);
                     }
                 }
@@ -310,15 +386,7 @@ content:        variable
                 |statment
                 ;
 
-statment:       block
-                |simple
-                |expressions
-                |function_invocation
-                {
-                    functionVariable.clear();
-                }
-                |conditional
-                |loop
+
                 ;
 
 
@@ -366,9 +434,26 @@ simple:         ID ASSIGN expressions
                     }   
 
                 }
-                |PUT expressions
+                |PUT
                 {
-                    javaASM<<"  getstatic java.io.PrintStream java.lang.System.out"<<endl;
+                    java<<"getstatic java.io.PrintStream java.lang.System.out"<<endl;
+
+                } 
+                expressions
+                {
+                    if($3.dType==type_string)
+                    {
+                        java<<"invokevirtual void java.io.PrintStream.print(java.lang.String)"<<endl;
+                    }
+                    if($3.dType==type_int)
+                    {
+                        java<<"invokevirtual void java.io.PrintStream.print(int)"<<endl;
+                    }
+                    else if($3.dType==type_bool)
+                    {
+                        java<<"invokevirtual void java.io.PrintStream.print(boolean)"<<endl;
+                    }
+
                 }
                 |GET expressions
                 |RESULT expressions
@@ -377,7 +462,8 @@ simple:         ID ASSIGN expressions
                 |EXIT WHEN bool_expression
                 |SKIP
                 {
-                    javaASM<<"getstatic java.io.PrintStream java.lang.System.out\ninvokevirtual void java.io.PrintStream.println()"<<endl;
+                    java<<"getstatic java.io.PrintStream java.lang.System.out"<<endl;
+                    java<<"invokevirtual void java.io.PrintStream.println()"<<endl;
                 }
                 ;
 
@@ -395,35 +481,49 @@ expressions:    '-' expressions %prec NEGATIVE
                 |'(' expressions ')'            {$$=$2;}
                 |expressions '*' expressions
                 {
-                    // if($1!=$3)
-                    //     yyerror("ERROR: expression '*' type error");
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR: expression '*' type error");
                     // $$=$1;
                 }
                 |expressions '/' expressions
                 {
-                    // if($1!=$3)
-                    //     yyerror("ERROR: expression '/' type error");
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR: expression '*' type error");
                     // $$=$1;
                 }
                 |expressions MOD expressions{
-                    // if($1!=$3)
-                    //     yyerror("ERROR: expression '%' type error");
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR: expression '*' type error");
                     // $$=$1;
                 }
                 |expressions '+' expressions
                 {
-                    // if($1!=$3)
-                    //     yyerror("ERROR: expression '+' type error");
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR: expression '*' type error");
                     // $$=$1;
                 }
                 |expressions '-' expressions
                 {
-                    // if($1!=$3)
-                    //     yyerror("ERROR: expression '-' type error");
-                    // $$=$1;
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR: expression '*' type error");
+                    copyTokenInfo($$,$1);
+                    if($1.dType==type_int)
+                    {
+                        $$.value.intValue=$1.value.intValue-$3.value.intValue;
+                    }
+                    else if($1.dType==type_real)
+                    {
+                        $$.value.doubleValue=$1.value.doubleValue-$3.value.doubleValue;
+                    }
                 }
-                |bool_expression    {$$=$1;}
-                |const_exp          {$$=$1;}
+                |bool_expression    
+                {
+                    copyTokenInfo($$,$1);
+                }
+                |const_exp          
+                {
+                    copyTokenInfo($$,$1);
+                }
                 |function_invocation
                 {
                     // functionVariable.clear();
@@ -638,7 +738,7 @@ loop:           LOOP
                 {
                     if(s_table.lookup($2.tokenID)==0)
                     {
-                        printf("ERROR: for loop $s not found\n",$2);
+                        printf("ERROR: for loop %s not found\n",$2.tokenID);
                     }
                     if($4.dType!=$7.dType)
                     {
@@ -665,7 +765,7 @@ loop:           LOOP
                 {
                     if(s_table.lookup($3.tokenID)==0)
                     {
-                        printf("ERROR: for loop $s not found\n",$3);
+                        printf("ERROR: for loop %s not found\n",$3.tokenID);
                     }
                     if($5.dType!=$8.dType)
                     {
@@ -707,15 +807,15 @@ int main(int argc,char **argv)
         exit(1);
     }
     yyin = fopen(argv[1], "r");         /* open input file */
-    string fileName=argv[1];
-    fileName.replace(fileName.size()-3,3,"");
-    javaASM.open(fileName+".jasm");
-    javaASM<<"class "<<fileName<<"{\nmethod public static void main(java.lang.String[])\nmax_stack 15\n max_locals 15\n{"<<endl;
+    className=argv[1];
+    className.replace(className.size()-3,3,"");
+    java.open(className+".jasm");
+    java<<"class "<<className<<"{"<<endl;
 
     /* perform parsing */
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
     s_table.dump();
-    javaASM<<"return\n}\n}"<<endl;
-    javaASM.close();
+    java<<"}"<<endl;
+    java.close();
 }
