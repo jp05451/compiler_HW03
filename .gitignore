@@ -1,7 +1,9 @@
 *.st
-y.tab.cpp
+*.jasm
+*.cpp
 y.tab.hpp
 lex.yy.cpp
 parser
 y.output
 .vscode/*
+javaaPoreable/*

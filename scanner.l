@@ -74,7 +74,7 @@ ID {alphaBat}+({digits}|{alphaBat})*
 begin           {token(BEG);}
 array           {token(ARRAY);}
 bool            {
-                yylval.info.dType=type_bool;
+                yylval.dType=type_bool;
                 token(BOOL);
                 }
 char            {token(CHAR);}
@@ -95,7 +95,7 @@ function        {token(FUNCTION);}
 get             {token(GET);}
 if              {token(IF);}
 int             {
-                yylval.info.dType=type_int;
+                yylval.dType=type_int;
                 token(INT);
                 }
 loop            {token(LOOP);}
@@ -103,14 +103,14 @@ of              {token(OF);}
 put             {token(PUT);}
 procedure       {token(PROCEDURE);}
 real            {
-                yylval.info.dType=type_real;
+                yylval.dType=type_real;
                 token(REAL);
                 }
 result          {token(RESULT);}
 return          {token(RETURN);}
 skip            {token(SKIP);}
 string          {
-                yylval.info.dType=type_string;
+                yylval.dType=type_string;
                 token(STRING);
                 }
 then            {token(THEN);}

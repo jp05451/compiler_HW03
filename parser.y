@@ -14,7 +14,6 @@ int stackNumber=0;
 
 
 vector<tokenInfo> functionVariable;
-stack<int> scopeStack;
 
 
 ofstream javaASM;
@@ -59,7 +58,7 @@ ofstream javaASM;
 program:        declarations statments
                 ;
 
- declarations:   declarations declaration
+declarations:   declarations declaration
                 |
                 ;
 
@@ -80,30 +79,27 @@ constant:       CONST ID ':' Type ASSIGN expressions
                         yyerror("ERROR: const assign type error");
                     else
                     {
-                        tokenInfo t;
-                        strcpy(t.tokenID,$2.tokenID);
-                        t.is_const=1;
-                        copyTokenInfo(t,$6);
-                        s_table.insert(t,currentStack);
+                        // copyTokenInfo(t,$6);
+                        
+                        strcpy($6.tokenID,$2.tokenID);
+                        $6.is_const=1;
+                        s_table.insert($6,currentStack);
                     }
                 }
                 
                 |CONST ID ASSIGN expressions
                 {
-                    tokenInfo t;
-                    strcpy(t.tokenID,$2.tokenID);
-                    t.is_const=1;
-                    copyTokenInfo(t,$4);
-                    s_table.insert(t,currentStack);
+                    strcpy($4.tokenID,$2.tokenID);
+                    $4.is_const=1;
+                    s_table.insert($4,currentStack);
                 }
                 ;
 
 variable:       VAR ID ':' Type
                 {
-                    tokenInfo t;
-                    // strcpy(t.tokenID,$2.tokenID);
                     $2.dType=$4;
-                    // t.dType=$4;
+                    cout<<$2.dType<<endl;
+
                     s_table.insert($2,currentStack);
                 }
                 |VAR ID ASSIGN const_exp
@@ -149,37 +145,51 @@ Type:           BOOL        {$$=$1;}
 
 function:       FUNCTION ID '(' ')' ':' Types
                 {
-                    // s_table.insert($2,intToType($6),is_func,0);
-                    // s_table.table[$2].fData.varNumber=0;
-                    // currentStack=++stackNumber;    
+                    if(s_table.lookup($2.tokenID)==1)
+                    {
+                        printf("ERROR: %s is already define\n",$2.tokenID);
+                    }
+                    $2.dType=$6;
+                    $2.is_function=1;
+                    s_table.insert($2,0);
+
+                    currentStack=++stackNumber;    
                 }
                 contents
                 END ID
                 {
-                    // currentStack=0;
+                    currentStack=0;
                 }
                 |FUNCTION ID '(' functionVarA functionVarB ')' ':' Types
                 {
-                    // // s_table.insert($2,intToType($9),is_func,0);
-                    // // {currentStack=++stackNumber;}
-                    // s_table.insert($2,intToType($8),is_func,0);
-                    // currentStack=++stackNumber;
-                    // for(auto &fVar:functionVariable)
-                    // {
-                    //     s_table.table[$2].fData.functionVar.push_back(fVar.funcVarType);
-                    //     //insert variable in functionData
+                    
+                    if(s_table.lookup($2.tokenID)==1)
+                    {
+                        printf("ERROR: %s is already define\n",$2.tokenID);
+                    }
+                    $2.dType=$8;
+                    $2.is_function=1;
+                    // $2.funcParams.funcParamNumber=0;
+                    s_table.insert($2,0);
+                    currentStack=++stackNumber;
 
-                    //     s_table.insert(fVar.varID,fVar.funcVarType,fVar.isArray? is_arr:is_normal,currentStack);
-                    //     //insert variable to symbolTable
-                    // }
-                    // s_table.table[$2].fData.varNumber=functionVariable.size();
+
+                    // //copy func param to symboldata
+                    for(int i=0;i<functionVariable.size();i++)
+                    {
+                        //insert variable in functionData
+                        s_table.table[$2.tokenID].funcParameters.push_back(functionVariable[i].dType);
+
+                        //insert variable to symbolTable
+                        s_table.insert(functionVariable[i],currentStack);
+                    }
 
                 }
                 contents
                 END ID
                 {
-                    // currentStack=0;
-                    // functionVariable.clear();
+                    currentStack=0;
+                    functionVariable.clear();
                 }
                 ;
 
@@ -187,49 +197,71 @@ function:       FUNCTION ID '(' ')' ':' Types
 
 functionVarA:   ID ':' Type
                 {
-                    // // s_table.insert($1,intToType($3),is_normal,currentStack);
-                    // funcVar temp;
-                    // temp.varID=$1;
-                    // temp.funcVarType=intToType($3);
-                    // temp.isArray=0;
-                    // functionVariable.push_back(temp);
+                    tokenInfo temp;
+                    strcpy(temp.tokenID,$1.tokenID);
+                    temp.dType=$3;
+                    temp.is_array=0;
+
+                    //push func parameter to function var
+                    functionVariable.push_back(temp);
                 }
                 |ID ':' ARRAY const_exp '.' '.' const_exp OF Type
                 {
-                    // s_table.insert($1,intToType($9),is_arr,currentStack);
-                    // funcVar temp;
-                    // temp.varID=$1;
-                    // temp.funcVarType=intToType($9);
-                    // temp.isArray=1;
-                    // functionVariable.push_back(temp);
+                    tokenInfo temp;
+                    strcpy(temp.tokenID,$1.tokenID);
+                    temp.dType=$9;
+                    temp.is_array=1;
+
+                    //push func parameter to function var
+                    functionVariable.push_back(temp);
                 }
                 ;
 
 functionVarB:   functionVarB ',' ID ':' Type
                 {
-                    // // s_table.insert($3,intToType($5),is_normal,currentStack);
-                    // funcVar temp;
-                    // temp.varID=$3;
-                    // temp.funcVarType=intToType($5);
-                    // temp.isArray=0;
-                    // functionVariable.push_back(temp);
+                    tokenInfo temp;
+                    strcpy(temp.tokenID,$3.tokenID);
+                    temp.dType=$5;
+                    temp.is_array=0;
+
+                    //push func parameter to function var
+                    functionVariable.push_back(temp);
                 }
                 |functionVarB ',' ID ':' ARRAY const_exp '.' '.' const_exp OF Type
                 {
-                    // // s_table.insert($3,intToType($11),is_arr,currentStack);
-                    // funcVar temp;
-                    // temp.varID=$3;
-                    // temp.funcVarType=intToType($11);
-                    // temp.isArray=1;
-                    // functionVariable.push_back(temp);
+                    tokenInfo temp;
+                    strcpy(temp.tokenID,$1.tokenID);
+                    temp.dType=$11;
+                    temp.is_array=1;
+
+                    //push func parameter to function var
+                    functionVariable.push_back(temp);
                 }
                 |
                 ;
 
 procedure:      PROCEDURE ID '(' ')'
                 {
-                    // s_table.insert($2,type_null,is_func,0);
-                    // currentStack=++stackNumber;
+                    if(s_table.lookup($2.tokenID)==1)
+                    {
+                        printf("ERROR: %s is already define\n",$2.tokenID);
+                    }
+                    $2.dType=type_null;
+                    $2.is_function=1;
+                    // $2.funcParams.funcParamNumber=0;
+                    s_table.insert($2,0);
+                    currentStack=++stackNumber;
+
+
+                    //copy func param to symboldata
+                    for(int i=0;i<functionVariable.size();i++)
+                    {
+                        //insert variable in functionData
+                        s_table.table[$2.tokenID].funcParameters[i]=functionVariable[i].dType;
+
+                        //insert variable to symbolTable
+                        s_table.insert(functionVariable[i],currentStack);
+                    }
 
                 }
                 contents
@@ -239,25 +271,32 @@ procedure:      PROCEDURE ID '(' ')'
                 }
                 |PROCEDURE ID '(' functionVarA functionVarB ')'
                 {
-                    // // s_table.insert($2,intToType($9),is_func,0);
-                    // // {currentStack=++stackNumber;}
-                    // s_table.insert($2,type_null,is_func,0);
-                    // currentStack=++stackNumber;
-                    // for(auto &fVar:functionVariable)
-                    // {
-                    //     s_table.table[$2].fData.functionVar.push_back(fVar.funcVarType);
-                    //     //insert variable to function Data
+                    if(s_table.lookup($2.tokenID)==1)
+                    {
+                        printf("ERROR: %s is already define\n",$2.tokenID);
+                    }
+                    $2.dType=type_null;
+                    $2.is_function=1;
+                    // $2.funcParams.funcParamNumber=0;
+                    s_table.insert($2,0);
+                    currentStack=++stackNumber;
 
-                    //     s_table.insert(fVar.varID,fVar.funcVarType,fVar.isArray? is_arr:is_normal,currentStack);
-                    //     //insert variable to symbolTable
-                    // }
-                    // s_table.table[$2].fData.varNumber=functionVariable.size();
+
+                    //copy func param to symboldata
+                    for(int i=0;i<functionVariable.size();i++)
+                    {
+                        //insert variable in functionData
+                        s_table.table[$2.tokenID].funcParameters[i]=functionVariable[i].dType;
+
+                        //insert variable to symbolTable
+                        s_table.insert(functionVariable[i],currentStack);
+                    }
                 }
                 contents
                 END ID
                 {
-                    // currentStack=0;
-                    // functionVariable.clear();
+                    currentStack=0;
+                    functionVariable.clear();
                 }
                 ;
 
@@ -274,10 +313,10 @@ content:        variable
 statment:       block
                 |simple
                 |expressions
-                /* |function_invocation
+                |function_invocation
                 {
                     functionVariable.clear();
-                } */
+                }
                 |conditional
                 |loop
                 ;
@@ -285,46 +324,46 @@ statment:       block
 
 block:          BEG     
                 {
-                    // scopeStack.push(currentStack);
-                    // currentStack=++stackNumber;
-                    // s_table.insertStack(scopeStack.top(),currentStack);
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
                 }
                 content
                 END     
                 {
-                    // if(scopeStack.empty())
-                    // {
-                    //     currentStack=0;
-                    // }
-                    // else
-                    // {
-                    //     currentStack=scopeStack.top();
-                    //     scopeStack.pop();
-                    // }
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
                 }
                 ;
 
 simple:         ID ASSIGN expressions
                 {
-                    // if(s_table.lookup($1)==0)
-                    // //symbol is not declare
-                    // {
-                    //     printf("ERROR: %s not declare\n",$1);
-                    // }
-                    // else if(s_table.table[$1].masterType==is_constant)
-                    // //symbol is constant
-                    // {
-                    //     printf("ERROR %s is constant unable to assign\n",$1);
-                    // }
-                    // else if(s_table.table[$1].type!=$3)
-                    // //type error
-                    // {
-                    //     printf("ERROR: %s assign type error\n",$1);
-                    // }
-                    // else if(s_table.canAccess($1,currentStack)==0)
-                    // {
-                    //     printf("ERROR: %s is unable to access\n",$1);
-                    // }   
+                    if(s_table.lookup($1.tokenID)==0)
+                    //symbol is not declare
+                    {
+                        printf("ERROR: %s not declare\n",$1.tokenID);
+                    }
+                    else if(s_table.table[$1.tokenID].info.is_const)
+                    //symbol is constant
+                    {
+                        printf("ERROR %s is constant unable to assign\n",$1.tokenID);
+                    }
+                    else if(s_table.table[$1.tokenID].info.dType!=$3.dType)
+                    //type error
+                    {
+                        printf("ERROR: %s assign type error\n",$1.tokenID);
+                    }
+                    else if(s_table.canAccess($1.tokenID,currentStack)==0)
+                    {
+                        printf("ERROR: %s is unable to access\n",$1.tokenID);
+                    }   
 
                 }
                 |PUT expressions
@@ -346,11 +385,12 @@ simple:         ID ASSIGN expressions
     //======================expression=====================
 expressions:    '-' expressions %prec NEGATIVE  
                 {
-                    // if($2!=type_int && $2!=type_real)
-                    // {
-                    //     printf("ERROR: %d unable to calculate negetive\n",$2);
-                    // }
-                    // $$=$2;
+                    if($2.dType!=type_int && $2.dType!=type_real)
+                    {
+                        printf("ERROR: %s unable to calculate negetive\n",$2.tokenID);
+                    }
+                    // $2.value *= -1;
+                    copyTokenInfo($$,$2);
                 }
                 |'(' expressions ')'            {$$=$2;}
                 |expressions '*' expressions
@@ -390,32 +430,31 @@ expressions:    '-' expressions %prec NEGATIVE
                 }
                 |ID '[' INT_NUMBER ']'
                 {
-                    // if(s_table.lookup($1)==0)
-                    // {
-                    //     printf("ERROR: ID %s not found\n",$1);
-                    // }
-                    // else if(s_table.canAccess($1,currentStack)==0)
-                    // {
-                    //     printf("ERROR: %s is unable to reach\n",$1);
-                    //     $$=s_table.table[$1].type;
-                    // }
-                    // else
-                    //     $$=s_table.table[$1].type;
+                    if(s_table.lookup($1.tokenID)==0)
+                    {
+                        printf("ERROR: ID %s not found\n",$1.tokenID);
+                    }
+                    else if(s_table.canAccess($1.tokenID,currentStack)==0)
+                    {
+                        printf("ERROR: %s is unable to reach\n",$1.tokenID);
+                        copyTokenInfo($$,s_table.table[$1.tokenID].info);
+                    }
+                    else
+                        copyTokenInfo($$,s_table.table[$1.tokenID].info);
                 }
                 |ID
                 {
-                    // if(s_table.lookup($1)==0)
-                    // {
-                    //     printf("ERROR: ID %s not found\n",$1);
-                    // }
-                    // else if(s_table.canAccess($1,currentStack)==0)
-                    // {
-
-                    //     printf("ERROR: %s stack: %d is unable to reach\n",$1,currentStack);
-                    //     $$=s_table.table[$1].type;
-                    // }
-                    // else
-                    //     $$=s_table.table[$1].type;
+                    if(s_table.lookup($1.tokenID)==0)
+                    {
+                        printf("ERROR: ID %s not found\n",$1.tokenID);
+                    }
+                    else if(s_table.canAccess($1.tokenID,currentStack)==0)
+                    {
+                        printf("ERROR: %s is unable to reach\n",$1.tokenID);
+                        copyTokenInfo($$,s_table.table[$1.tokenID].info);
+                    }
+                    else
+                        copyTokenInfo($$,s_table.table[$1.tokenID].info);
                 }
                 ;
 const_exp:      INT_NUMBER      {$$=$1;}
@@ -427,38 +466,37 @@ const_exp:      INT_NUMBER      {$$=$1;}
 bool_expression:    '(' bool_expression ')'             {$$=$2;}
                     |expressions '<' expressions   
                     {
-                    // if($1!=$3)
-                    //     yyerror("ERROR:bool_expression '<' type error");
-                    // $$=type_bool;
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR:bool_expression '<' type error");
                     }     
                     |expressions LESS_EQUAL expressions
                     {
-                    // if($1!=$3)
-                    //     yyerror("ERROR:bool_expression '<=' type error");
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR:bool_expression '<' type error");
                     // $$=type_bool;
                     }     
                     |expressions '=' expressions
                     {
-                    // if($1!=$3)
-                    //     yyerror("ERROR:bool_expression '=' type error");
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR:bool_expression '<' type error");
                     // $$=type_bool;
                     }     
                     |expressions MORE_EQUAL expressions
                     {
-                    // if($1!=$3)
-                    //     yyerror("ERROR:bool_expression '>=' type error");
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR:bool_expression '<' type error");
                     // $$=type_bool;
                     }     
                     |expressions '>' expressions
                     {
-                    // if($1!=$3)
-                    //     yyerror("ERROR:bool_expression '>' type error");
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR:bool_expression '<' type error");
                     // $$=type_bool;
                     }     
                     |expressions NOT_EQUAL expressions
                     {
-                    // if($1!=$3)
-                    //     yyerror("ERROR:bool_expression '!=' type error");
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR:bool_expression '<' type error");
                     // $$=type_bool;
                     }     
                     |NOT expressions
@@ -467,188 +505,188 @@ bool_expression:    '(' bool_expression ')'             {$$=$2;}
                     }
                     |expressions AND expressions
                     {
-                    // if($1!=$3)
-                    //     yyerror("ERROR:bool_expression 'AND' type error");
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR:bool_expression '<' type error");
                     // $$=type_bool;
                     }     
                     |expressions OR expressions
                     {
-                    // if($1!=$3)
-                    //     yyerror("ERROR:bool_expression 'OR' type error");
+                    if($1.dType!=$3.dType)
+                        yyerror("ERROR:bool_expression '<' type error");
                     // $$.info.dType=type_bool;
                     }     
                     ;
 function_invocation:    ID '(' ')' 
                         {
-                            // if(s_table.lookup($1.info.tokenID)==0)
-                            // {
-                            //     yyerror("ERROR: function not declare");
-                            // }
-                            // else if(s_table.table[$1].masterType!=is_func)
-                            // {
-                            //     printf("ERROR: %s is not function\n",$1);
-                            //     $$=s_table.table[$1].type;
-                            // }
-                            // else
-                            // {
-                            //     $$=s_table.table[$1].type;
-                            // }
+                            if(s_table.lookup($1.tokenID)==0)
+                            {
+                                yyerror("ERROR: function not declare");
+                            }
+                            else if(s_table.table[$1.tokenID].info.is_function)
+                            {
+                                printf("ERROR: %s is not function\n",$1.tokenID);
+                                copyTokenInfo($$,s_table.table[$1.tokenID].info);
+                            }
+                            else
+                            {
+                                copyTokenInfo($$,s_table.table[$1.tokenID].info);
+                            }
                         }
                         |ID '(' functionInputA functionInputB ')'
                         {
-                            // if(s_table.lookup($1)==0)
-                            // {
-                            //     printf("ERROR: function %s not declare\n",$1);
-                            // }
-                            // else if(s_table.table[$1].masterType!=is_func)
-                            // {
-                            //     printf("ERROR: %s is not function\n",$1);
-                            //     $$=s_table.table[$1].type;
+                            if(s_table.lookup($1.tokenID)==0)
+                            {
+                                printf("ERROR: function %s not declare\n",$1.tokenID);
+                            }
+                            else if(s_table.table[$1.tokenID].info.is_function)
+                            {
+                                printf("ERROR: %s is not function\n",$1.tokenID);
+                                copyTokenInfo($$,s_table.table[$1.tokenID].info);
 
-                            // }
-                            // else if(s_table.funcVarCorrect($1,functionVariable)==0)
+                            }
+                            // else if(s_table.funcVarCorrect($1.tokenID,functionVariable)==0)
                             // {
                             //     printf("ERROR: function %s input error\n",$1);
-                            //     $$=s_table.table[$1].type;
+                            //     copyTokenInfo($$,s_table.table[$1.tokenID].info);
                             // }
-                            // else
-                            // {
-                            //     $$=s_table.table[$1].type;
-                            // }
+                            else
+                            {
+                                copyTokenInfo($$,s_table.table[$1.tokenID].info);
+                            }
                         }
                         ;
 functionInputA:     expressions
                     {
-                        // funcVar temp;
-                        // temp.funcVarType=intToType($1);
-                        // temp.isArray=0;
-                        // functionVariable.push_back(temp);
+                        tokenInfo temp;
+                        temp.dType=$1.dType;
+                        temp.is_array=0;
+                        functionVariable.push_back(temp);
                     }
                     ;
 functionInputB:     functionInputB ',' expressions
                     {
-                        // funcVar temp;
-                        // temp.funcVarType=intToType($3);
-                        // temp.isArray=0;
-                        // functionVariable.push_back(temp);
+                        tokenInfo temp;
+                        temp.dType=$3.dType;
+                        temp.is_array=0;
+                        functionVariable.push_back(temp);
                     }
                     |
                     ;
 
 conditional:    IF bool_expression THEN
                 {
-                    // scopeStack.push(currentStack);
-                    // currentStack=++stackNumber;
-                    // s_table.insertStack(scopeStack.top(),currentStack);
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
                 }
                 contents
                 ELSE
                 content
                 END IF
                 {
-                    // if(scopeStack.empty())
-                    // {
-                    //     currentStack=0;
-                    // }
-                    // else
-                    // {
-                    //     currentStack=scopeStack.top();
-                    //     scopeStack.pop();
-                    // }
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
                 }
                 |IF bool_expression THEN
                 {
-                    // scopeStack.push(currentStack);
-                    // currentStack=++stackNumber;
-                    // s_table.insertStack(scopeStack.top(),currentStack);
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
                 }
                 contents
                 END IF
                 {
-                    // if(scopeStack.empty())
-                    // {
-                    //     currentStack=0;
-                    // }
-                    // else
-                    // {
-                    //     currentStack=scopeStack.top();
-                    //     scopeStack.pop();
-                    // }
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
                 }
 
 loop:           LOOP
                 {
-                    // scopeStack.push(currentStack);
-                    // currentStack=++stackNumber;
-                    // s_table.insertStack(scopeStack.top(),currentStack);
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
 
                 }
                 contents
                 END LOOP
                 {
-                    // if(scopeStack.empty())
-                    // {
-                    //     currentStack=0;
-                    // }
-                    // else
-                    // {
-                    //     currentStack=scopeStack.top();
-                    //     scopeStack.pop();
-                    // }
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
                 }
                 |FOR ID ':' expressions  '.' '.' expressions
                 {
-                    // if(s_table.lookup($2)==0)
-                    // {
-                    //     printf("ERROR: for loop $s not found\n",$2);
-                    // }
-                    // if($4!=$7)
-                    // {
-                    //     printf("ERROR: for loop range error\n");
-                    // }
-                    // scopeStack.push(currentStack);
-                    // currentStack=++stackNumber;
-                    // s_table.insertStack(scopeStack.top(),currentStack);
+                    if(s_table.lookup($2.tokenID)==0)
+                    {
+                        printf("ERROR: for loop $s not found\n",$2);
+                    }
+                    if($4.dType!=$7.dType)
+                    {
+                        printf("ERROR: for loop range error\n");
+                    }
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
                 }
                 contents
                 END FOR
                 {
-                    // if(scopeStack.empty())
-                    // {
-                    //     currentStack=0;
-                    // }
-                    // else
-                    // {
-                    //     currentStack=scopeStack.top();
-                    //     scopeStack.pop();
-                    // }
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
                 }
                 |FOR DECREASING ID ':' expressions  '.' '.' expressions
                 {
-                    // if(s_table.lookup($3)==0)
-                    // {
-                    //     printf("ERROR: for loop $s not found\n",$3);
-                    // }
-                    // if($5!=$8)
-                    // {
-                    //     printf("ERROR: for loop range error\n");
-                    // }
-                    // scopeStack.push(currentStack);
-                    // currentStack=++stackNumber;
-                    // s_table.insertStack(scopeStack.top(),currentStack);
+                    if(s_table.lookup($3.tokenID)==0)
+                    {
+                        printf("ERROR: for loop $s not found\n",$3);
+                    }
+                    if($5.dType!=$8.dType)
+                    {
+                        printf("ERROR: for loop range error\n");
+                    }
+                    scopeStack.push(currentStack);
+                    currentStack=++stackNumber;
+                    s_table.insertStack(scopeStack.top(),currentStack);
                 }
                 contents
                 END FOR
                 {
-                    // if(scopeStack.empty())
-                    // {
-                    //     currentStack=0;
-                    // }
-                    // else
-                    // {
-                    //     currentStack=scopeStack.top();
-                    //     scopeStack.pop();
-                    // }
+                    if(scopeStack.empty())
+                    {
+                        currentStack=0;
+                    }
+                    else
+                    {
+                        currentStack=scopeStack.top();
+                        scopeStack.pop();
+                    }
                 } 
 
 %%
