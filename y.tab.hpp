@@ -49,12 +49,12 @@ extern int yydebug;
     INT = 259,
     STRING = 260,
     BOOL = 261,
-    TRUE = 262,
-    FALSE = 263,
-    INT_NUMBER = 264,
-    REAL_NUMBER = 265,
-    STR = 266,
-    ID = 267,
+    ID = 262,
+    INT_NUMBER = 263,
+    REAL_NUMBER = 264,
+    STR = 265,
+    TRUE = 266,
+    FALSE = 267,
     ARRAY = 268,
     BEG = 269,
     CHAR = 270,
@@ -95,12 +95,12 @@ extern int yydebug;
 #define INT 259
 #define STRING 260
 #define BOOL 261
-#define TRUE 262
-#define FALSE 263
-#define INT_NUMBER 264
-#define REAL_NUMBER 265
-#define STR 266
-#define ID 267
+#define ID 262
+#define INT_NUMBER 263
+#define REAL_NUMBER 264
+#define STR 265
+#define TRUE 266
+#define FALSE 267
 #define ARRAY 268
 #define BEG 269
 #define CHAR 270
@@ -140,11 +140,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 36 "parser.y" /* yacc.c:1909  */
- 
+#line 24 "parser.y" /* yacc.c:1909  */
+
+    // string identity;
+    dataType dType;
     tokenInfo info;
 
-#line 148 "y.tab.hpp" /* yacc.c:1909  */
+#line 150 "y.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

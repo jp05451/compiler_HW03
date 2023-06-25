@@ -23,16 +23,17 @@ ofstream javaASM;
 
 %union {
     // string identity;
+    dataType dType;
     tokenInfo info;
 }
 
-%token <info> REAL INT STRING BOOL TRUE FALSE INT_NUMBER REAL_NUMBER STR
-%token <info> ID 
+%token <dType> REAL INT STRING BOOL  
+%token <info> ID INT_NUMBER REAL_NUMBER STR TRUE FALSE
 
-%type <info> expressions 
+%type <info> expressions array function_invocation functionVarA functionVarB
 %type <info> bool_expression
 %type <info> const_exp
-%type <info> Types Type array function_invocation functionVarA functionVarB
+%type <dType> Types Type 
 
 /* tokens */
 %token ARRAY BEG CHAR  DECREASING DEFAULT DO ELSE END EXIT  FOR FUNCTION GET IF LOOP OF PUT PROCEDURE RESULT RETURN SKIP THEN  VAR WHEN CONST 
@@ -75,14 +76,14 @@ declaration:    constant
 
 constant:       CONST ID ':' Type ASSIGN expressions
                 {
-                    if($4.dType!=$6.dType)
+                    if($2.dType!=$6.dType)
                         yyerror("ERROR: const assign type error");
                     else
                     {
                         tokenInfo t;
                         strcpy(t.tokenID,$2.tokenID);
                         t.is_const=1;
-                        copyTokenInfo(&t,&$6);
+                        copyTokenInfo(t,$6);
                         s_table.insert(t,currentStack);
                     }
                 }
@@ -91,41 +92,52 @@ constant:       CONST ID ':' Type ASSIGN expressions
                 {
                     tokenInfo t;
                     strcpy(t.tokenID,$2.tokenID);
-                    // t.tokenID=$2.tokenID;
                     t.is_const=1;
-                    // t.info=$4.info;
-                    copyTokenInfo(&t,&$4);
+                    copyTokenInfo(t,$4);
                     s_table.insert(t,currentStack);
                 }
                 ;
 
 variable:       VAR ID ':' Type
                 {
-                    // s_table.insert($2,intToType($4),is_normal,currentStack);
+                    tokenInfo t;
+                    // strcpy(t.tokenID,$2.tokenID);
+                    $2.dType=$4;
+                    // t.dType=$4;
+                    s_table.insert($2,currentStack);
                 }
                 |VAR ID ASSIGN const_exp
                 {
-                    // // if($4!=$6)
-                    // //     yyerror("ERROR: const assign type error");
-                    // s_table.insert($2,intToType($4),is_normal,currentStack);
+                    // if($4!=$6)
+                    //     yyerror("ERROR: var assign type error");
+                    $2.dType=$4.dType;
+                    $2.value=$4.value;
+                    s_table.insert($2,currentStack);
                 }
                 |VAR ID ':' Type ASSIGN const_exp
                 {
-                    // if($4!=$6)
-                    //     yyerror("ERROR: const assign type error");
-                    // s_table.insert($2,intToType($4),is_normal,currentStack);
+                    if($4!=$6.dType)
+                        yyerror("ERROR: const assign type error");
+                    else
+                    {
+                        $2.dType=$4;
+                        $2.value=$6.value;
+                        s_table.insert($2,currentStack);
+                    }
                 }
                 
                 ;
 
 Types:          Type    {$$=$1;}  
-                |array  {$$=$1;}  
+                |array  {$$=$1.dType;}  
                 ;
 
 array:          VAR ID ':' ARRAY  const_exp '.' '.' const_exp OF Type
                 {
-                    // s_table.insert($2,intToType($10),is_arr,currentStack);
-                    // $$ = $10;
+                    $2.dType=$10;
+                    $2.is_array=1;
+                    s_table.insert($2,currentStack);
+                    copyTokenInfo($$,$2);
                 }
                 ;
 

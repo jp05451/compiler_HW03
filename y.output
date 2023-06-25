@@ -5,7 +5,7 @@ Terminals unused in grammar
    DO
 
 
-State 24 conflicts: 1 shift/reduce
+State 19 conflicts: 1 shift/reduce
 State 41 conflicts: 1 shift/reduce
 State 60 conflicts: 1 shift/reduce
 State 61 conflicts: 1 shift/reduce
@@ -116,7 +116,7 @@ Grammar
    64            | bool_expression
    65            | const_exp
    66            | function_invocation
-   67            | ID '[' INT ']'
+   67            | ID '[' INT_NUMBER ']'
    68            | ID
 
    69 const_exp: INT_NUMBER
@@ -184,16 +184,16 @@ $end (0) 0
 ']' (93) 67
 error (256)
 REAL (258) 21
-INT (259) 20 67
+INT (259) 20
 STRING (260) 22
 BOOL (261) 19
-TRUE (262) 72
-FALSE (263) 73
-INT_NUMBER (264) 69
-REAL_NUMBER (265) 70
-STR (266) 71
-ID (267) 11 12 13 14 15 18 24 26 27 28 29 30 33 35 49 67 68 84 85 96
+ID (262) 11 12 13 14 15 18 24 26 27 28 29 30 33 35 49 67 68 84 85 96
     98
+INT_NUMBER (263) 67 69
+REAL_NUMBER (264) 70
+STR (265) 71
+TRUE (266) 72
+FALSE (267) 73
 ARRAY (268) 18 28 30
 BEG (269) 48
 CHAR (270)
@@ -393,12 +393,12 @@ State 8
     1 program: declarations statments .
     4 statments: statments . statment
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     EXIT         shift, and go to state 26
     FOR          shift, and go to state 27
@@ -506,43 +506,8 @@ State 18
 
 State 19
 
-   72 const_exp: TRUE .
-
-    $default  reduce using rule 72 (const_exp)
-
-
-State 20
-
-   73 const_exp: FALSE .
-
-    $default  reduce using rule 73 (const_exp)
-
-
-State 21
-
-   69 const_exp: INT_NUMBER .
-
-    $default  reduce using rule 69 (const_exp)
-
-
-State 22
-
-   70 const_exp: REAL_NUMBER .
-
-    $default  reduce using rule 70 (const_exp)
-
-
-State 23
-
-   71 const_exp: STR .
-
-    $default  reduce using rule 71 (const_exp)
-
-
-State 24
-
    49 simple: ID . ASSIGN expressions
-   67 expressions: ID . '[' INT ']'
+   67 expressions: ID . '[' INT_NUMBER ']'
    68            | ID .
    84 function_invocation: ID . '(' ')'
    85                    | ID . '(' functionInputA functionInputB ')'
@@ -553,6 +518,41 @@ State 24
 
     '('       [reduce using rule 68 (expressions)]
     $default  reduce using rule 68 (expressions)
+
+
+State 20
+
+   69 const_exp: INT_NUMBER .
+
+    $default  reduce using rule 69 (const_exp)
+
+
+State 21
+
+   70 const_exp: REAL_NUMBER .
+
+    $default  reduce using rule 70 (const_exp)
+
+
+State 22
+
+   71 const_exp: STR .
+
+    $default  reduce using rule 71 (const_exp)
+
+
+State 23
+
+   72 const_exp: TRUE .
+
+    $default  reduce using rule 72 (const_exp)
+
+
+State 24
+
+   73 const_exp: FALSE .
+
+    $default  reduce using rule 73 (const_exp)
 
 
 State 25
@@ -587,12 +587,12 @@ State 28
 
    51 simple: GET . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -608,12 +608,12 @@ State 29
    90 conditional: IF . bool_expression THEN $@6 contents ELSE content END IF
    92            | IF . bool_expression THEN $@7 contents END IF
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -637,12 +637,12 @@ State 31
 
    50 simple: PUT . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -657,12 +657,12 @@ State 32
 
    52 simple: RESULT . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -691,12 +691,12 @@ State 35
 
    81 bool_expression: NOT . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -711,12 +711,12 @@ State 36
 
    57 expressions: '-' . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -732,12 +732,12 @@ State 37
    58 expressions: '(' . expressions ')'
    74 bool_expression: '(' . bool_expression ')'
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -865,11 +865,11 @@ State 49
 
    14 variable: VAR ID ASSIGN . const_exp
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
 
     const_exp  go to state 89
 
@@ -893,12 +893,12 @@ State 51
 
    12 constant: CONST ID ASSIGN . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -925,12 +925,12 @@ State 53
 
    49 simple: ID ASSIGN . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -946,12 +946,12 @@ State 54
    84 function_invocation: ID '(' . ')'
    85                    | ID '(' . functionInputA functionInputB ')'
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -966,21 +966,21 @@ State 54
 
 State 55
 
-   67 expressions: ID '[' . INT ']'
+   67 expressions: ID '[' . INT_NUMBER ']'
 
-    INT  shift, and go to state 102
+    INT_NUMBER  shift, and go to state 102
 
 
 State 56
 
    48 block: BEG $@5 . content END
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     EXIT         shift, and go to state 26
     FOR          shift, and go to state 27
@@ -1016,12 +1016,12 @@ State 57
 
    55 simple: EXIT WHEN . bool_expression
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1048,7 +1048,7 @@ State 59
 
 State 60
 
-   67 expressions: ID . '[' INT ']'
+   67 expressions: ID . '[' INT_NUMBER ']'
    68            | ID .
    84 function_invocation: ID . '(' ')'
    85                    | ID . '(' functionInputA functionInputB ')'
@@ -1316,12 +1316,12 @@ State 71
 
    61 expressions: expressions MOD . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1336,12 +1336,12 @@ State 72
 
    76 bool_expression: expressions LESS_EQUAL . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1356,12 +1356,12 @@ State 73
 
    78 bool_expression: expressions MORE_EQUAL . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1376,12 +1376,12 @@ State 74
 
    80 bool_expression: expressions NOT_EQUAL . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1396,12 +1396,12 @@ State 75
 
    82 bool_expression: expressions AND . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1416,12 +1416,12 @@ State 76
 
    83 bool_expression: expressions OR . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1436,12 +1436,12 @@ State 77
 
    75 bool_expression: expressions '<' . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1456,12 +1456,12 @@ State 78
 
    77 bool_expression: expressions '=' . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1476,12 +1476,12 @@ State 79
 
    79 bool_expression: expressions '>' . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1496,12 +1496,12 @@ State 80
 
    62 expressions: expressions '+' . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1516,12 +1516,12 @@ State 81
 
    63 expressions: expressions '-' . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1536,12 +1536,12 @@ State 82
 
    59 expressions: expressions '*' . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1556,12 +1556,12 @@ State 83
 
    60 expressions: expressions '/' . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1653,11 +1653,11 @@ State 94
 
    18 array: VAR ID ':' ARRAY . const_exp '.' '.' const_exp OF Type
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
 
     const_exp  go to state 133
 
@@ -1801,7 +1801,7 @@ State 101
 
 State 102
 
-   67 expressions: ID '[' INT . ']'
+   67 expressions: ID '[' INT_NUMBER . ']'
 
     ']'  shift, and go to state 137
 
@@ -1867,12 +1867,12 @@ State 109
 
    96 loop: FOR ID ':' . expressions '.' '.' expressions $@9 contents END FOR
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -1895,18 +1895,18 @@ State 111
    90 conditional: IF bool_expression THEN . $@6 contents ELSE content END IF
    92            | IF bool_expression THEN . $@7 contents END IF
 
-    TRUE         reduce using rule 89 ($@6)
-    TRUE         [reduce using rule 91 ($@7)]
-    FALSE        reduce using rule 89 ($@6)
-    FALSE        [reduce using rule 91 ($@7)]
+    ID           reduce using rule 89 ($@6)
+    ID           [reduce using rule 91 ($@7)]
     INT_NUMBER   reduce using rule 89 ($@6)
     INT_NUMBER   [reduce using rule 91 ($@7)]
     REAL_NUMBER  reduce using rule 89 ($@6)
     REAL_NUMBER  [reduce using rule 91 ($@7)]
     STR          reduce using rule 89 ($@6)
     STR          [reduce using rule 91 ($@7)]
-    ID           reduce using rule 89 ($@6)
-    ID           [reduce using rule 91 ($@7)]
+    TRUE         reduce using rule 89 ($@6)
+    TRUE         [reduce using rule 91 ($@7)]
+    FALSE        reduce using rule 89 ($@6)
+    FALSE        [reduce using rule 91 ($@7)]
     BEG          reduce using rule 89 ($@6)
     BEG          [reduce using rule 91 ($@7)]
     END          reduce using rule 91 ($@7)
@@ -1949,12 +1949,12 @@ State 112
    36 contents: contents . content
    94 loop: LOOP $@8 contents . END LOOP
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     END          shift, and go to state 143
     EXIT         shift, and go to state 26
@@ -2399,11 +2399,11 @@ State 134
 
    15 variable: VAR ID ':' Type ASSIGN . const_exp
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
 
     const_exp  go to state 156
 
@@ -2412,12 +2412,12 @@ State 135
 
    11 constant: CONST ID ':' Type ASSIGN . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -2439,7 +2439,7 @@ State 136
 
 State 137
 
-   67 expressions: ID '[' INT ']' .
+   67 expressions: ID '[' INT_NUMBER ']' .
 
     $default  reduce using rule 67 (expressions)
 
@@ -2488,12 +2488,12 @@ State 140
 
    98 loop: FOR DECREASING ID ':' . expressions '.' '.' expressions $@10 contents END FOR
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -2540,11 +2540,11 @@ State 145
 
    28 functionVarA: ID ':' ARRAY . const_exp '.' '.' const_exp OF Type
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
 
     const_exp  go to state 165
 
@@ -2606,12 +2606,12 @@ State 153
    33 procedure: PROCEDURE ID '(' ')' $@3 contents . END ID
    36 contents: contents . content
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     END          shift, and go to state 170
     EXIT         shift, and go to state 26
@@ -2713,12 +2713,12 @@ State 159
 
    87 functionInputB: functionInputB ',' . expressions
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -2774,12 +2774,12 @@ State 162
    36 contents: contents . content
    90 conditional: IF bool_expression THEN $@6 contents . ELSE content END IF
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     ELSE         shift, and go to state 176
     EXIT         shift, and go to state 26
@@ -2817,12 +2817,12 @@ State 163
    36 contents: contents . content
    92 conditional: IF bool_expression THEN $@7 contents . END IF
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     END          shift, and go to state 177
     EXIT         shift, and go to state 26
@@ -2928,11 +2928,11 @@ State 172
 
    18 array: VAR ID ':' ARRAY const_exp '.' '.' . const_exp OF Type
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
 
     const_exp  go to state 185
 
@@ -2975,12 +2975,12 @@ State 174
 
    96 loop: FOR ID ':' expressions '.' '.' . expressions $@9 contents END FOR
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -3002,12 +3002,12 @@ State 176
 
    90 conditional: IF bool_expression THEN $@6 contents ELSE . content END IF
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     EXIT         shift, and go to state 26
     FOR          shift, and go to state 27
@@ -3065,12 +3065,12 @@ State 180
    24 function: FUNCTION ID '(' ')' ':' Types $@1 contents . END ID
    36 contents: contents . content
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     END          shift, and go to state 191
     EXIT         shift, and go to state 26
@@ -3138,12 +3138,12 @@ State 184
    35 procedure: PROCEDURE ID '(' functionVarA functionVarB ')' $@4 contents . END ID
    36 contents: contents . content
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     END          shift, and go to state 195
     EXIT         shift, and go to state 26
@@ -3224,12 +3224,12 @@ State 187
 
    98 loop: FOR DECREASING ID ':' expressions '.' '.' . expressions $@10 contents END FOR
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
     ID           shift, and go to state 60
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     NOT          shift, and go to state 35
     '-'          shift, and go to state 36
     '('          shift, and go to state 37
@@ -3258,11 +3258,11 @@ State 190
 
    28 functionVarA: ID ':' ARRAY const_exp '.' '.' . const_exp OF Type
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
 
     const_exp  go to state 200
 
@@ -3287,11 +3287,11 @@ State 193
 
    30 functionVarB: functionVarB ',' ID ':' ARRAY . const_exp '.' '.' const_exp OF Type
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
 
     const_exp  go to state 203
 
@@ -3394,12 +3394,12 @@ State 202
    26 function: FUNCTION ID '(' functionVarA functionVarB ')' ':' Types $@2 contents . END ID
    36 contents: contents . content
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     END          shift, and go to state 210
     EXIT         shift, and go to state 26
@@ -3458,12 +3458,12 @@ State 206
    36 contents: contents . content
    96 loop: FOR ID ':' expressions '.' '.' expressions $@9 contents . END FOR
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     END          shift, and go to state 212
     EXIT         shift, and go to state 26
@@ -3550,12 +3550,12 @@ State 213
    36 contents: contents . content
    98 loop: FOR DECREASING ID ':' expressions '.' '.' expressions $@10 contents . END FOR
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
-    ID           shift, and go to state 24
+    ID           shift, and go to state 19
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
     BEG          shift, and go to state 25
     END          shift, and go to state 218
     EXIT         shift, and go to state 26
@@ -3606,11 +3606,11 @@ State 216
 
    30 functionVarB: functionVarB ',' ID ':' ARRAY const_exp '.' '.' . const_exp OF Type
 
-    TRUE         shift, and go to state 19
-    FALSE        shift, and go to state 20
-    INT_NUMBER   shift, and go to state 21
-    REAL_NUMBER  shift, and go to state 22
-    STR          shift, and go to state 23
+    INT_NUMBER   shift, and go to state 20
+    REAL_NUMBER  shift, and go to state 21
+    STR          shift, and go to state 22
+    TRUE         shift, and go to state 23
+    FALSE        shift, and go to state 24
 
     const_exp  go to state 219
 

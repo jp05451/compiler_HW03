@@ -1082,7 +1082,7 @@ YY_RULE_SETUP
 #line 89 "scanner.l"
 {
                 yylval.info.dType=type_bool;
-                yylval.info.boolValue=false;
+                yylval.info.value.boolValue=false;
                 token(FALSE);
                 }
 	YY_BREAK
@@ -1175,7 +1175,7 @@ YY_RULE_SETUP
 #line 118 "scanner.l"
 {
                 yylval.info.dType=type_bool;
-                yylval.info.boolValue=true;
+                yylval.info.value.boolValue=true;
                 token(TRUE);
                 }
 	YY_BREAK
@@ -1206,7 +1206,7 @@ YY_RULE_SETUP
                 int intNumber;
                 sscanf(yytext,"%d",&intNumber);
                 yylval.info.dType=type_int;
-                yylval.info.intValue=intNumber;
+                yylval.info.value.intValue=intNumber;
                 tokenInteger(INT_NUMBER,intNumber);
 }
 	YY_BREAK
@@ -1218,7 +1218,7 @@ YY_RULE_SETUP
                 sscanf(yytext,"%lf",&doubleNumber);
                 printf("%f\n",doubleNumber);
                 yylval.info.dType=type_real;
-                yylval.info.doubleValue=doubleNumber;
+                yylval.info.value.doubleValue=doubleNumber;
                 tokenReal(REAL_NUMBER,doubleNumber);
                 }
 	YY_BREAK

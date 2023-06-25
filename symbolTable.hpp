@@ -14,8 +14,6 @@
 
 using namespace std;
 
-
-
 enum dataType
 {
     type_int,
@@ -48,10 +46,12 @@ struct tokenInfo
     dataType dType;
 
     // token data
-    int intValue;
-    double doubleValue;
-    int boolValue;
-
+    union value
+    {
+        int intValue;
+        double doubleValue;
+        int boolValue;
+    }value;
     char stringValue[256];
 
     // // token type
@@ -60,37 +60,71 @@ struct tokenInfo
     int is_const;
 };
 
-void copyTokenInfo(struct tokenInfo *dest, const struct tokenInfo *src)
+// void copyTokenInfo(struct tokenInfo *dest, const struct tokenInfo *src)
+// {
+//     strcpy(dest->tokenID, src->tokenID);
+//     dest->dType = src->dType;
+//     dest->intValue = src->intValue;
+//     dest->doubleValue = src->doubleValue;
+//     dest->boolValue = src->boolValue;
+//     strcpy(dest->stringValue, src->stringValue);
+//     dest->is_array = src->is_array;
+//     dest->is_function = src->is_function;
+//     dest->is_const = src->is_const;
+// }
+
+void copyTokenInfo(tokenInfo &dest, const tokenInfo &src)
 {
-    strcpy(dest->tokenID, src->tokenID);
-    dest->dType = src->dType;
-    dest->intValue = src->intValue;
-    dest->doubleValue = src->doubleValue;
-    dest->boolValue = src->boolValue;
-    strcpy(dest->stringValue, src->stringValue);
-    dest->is_array = src->is_array;
-    dest->is_function = src->is_function;
-    dest->is_const = src->is_const;
+    strcpy(dest.tokenID, src.tokenID);
+    dest.dType = src.dType;
+    // dest.intValue = src.intValue;
+    // dest.doubleValue = src.doubleValue;
+    // dest.boolValue = src.boolValue;
+    dest.value = src.value;
+    strcpy(dest.stringValue, src.stringValue);
+    dest.is_array = src.is_array;
+    dest.is_function = src.is_function;
+    dest.is_const = src.is_const;
 }
 
-// enum master_type
-// {
-//     is_normal,
-//     is_arr,
-//     is_constant,
-//     is_func
-// };
+int compareTokenInfo(const tokenInfo &info1, const tokenInfo &info2)
+{
+    if (info1.dType != info2.dType)
+        return 0;
+    else
+        return 1;
+}
 
-// class funcVar
-// {
-// public:
-//     string varID;
-//     dataType funcVarType;
-//     bool isArray;
-// };
+void initializeTokenInfo(tokenInfo &info)
+{
+    strcpy(info.tokenID, "");     // Initialize tokenID as an empty string
+    info.dType = type_null;               // Initialize dType with default value
+    info.value.intValue = 0;             // Initialize intValu with default value
+    info.value.doubleValue = 0.0;       // Initialize doubleValue with default value
+    info.value.boolValue = 0;       // Initialize boolValue with default value
+    strcpy(info.stringValue, ""); // Initialize stringValue as an empty string
+    info.is_array = false;        // Initialize is_array with default value
+    info.is_function = false;     // Initialize is_function with default value
+    info.is_const = false;        // Initialize is_const with default value
+}
 
+    // enum master_type
+    // {
+    //     is_normal,
+    //     is_arr,
+    //     is_constant,
+    //     is_func
+    // };
 
-class symbolData
+    // class funcVar
+    // {
+    // public:
+    //     string varID;
+    //     dataType funcVarType;
+    //     bool isArray;
+    // };
+
+    class symbolData
 {
 public:
     vector<int> stackNum;
@@ -106,7 +140,6 @@ bool isNumeric(std::string const &str)
     while (it != str.end() && std::isdigit(*it))
     {
         it++;
-
     }
     return !str.empty() && it == str.end();
 }
@@ -142,7 +175,7 @@ bool symbolTable::lookup(const string &symbol)
 void symbolTable::insert(const tokenInfo symbol, int _stackNum)
 {
 
-    table[symbol.tokenID].info = symbol;
+    copyTokenInfo(table[symbol.tokenID].info, symbol);
     table[symbol.tokenID].stackNum.push_back(_stackNum);
     // insertStack(symbol, scopeStack.top(), _stackNum);
     // cout << symbol << " is inserted in stack " << _stackNum << endl;
@@ -200,7 +233,7 @@ void symbolTable::dump()
         else
             cout << "normal ";
 
-        cout << typeString[a.second.info.dType%7] << "\t\t";
+        cout << typeString[a.second.info.dType % 7] << "\t\t";
         for (auto s : a.second.stackNum)
         {
             cout << s << " ";
@@ -251,7 +284,7 @@ bool symbolTable::funcVarCorrect(string funcName, vector<dataType> &inputVar)
         return 0;
     }
 
-    if (!table[funcName].info.is_function||inputVar.size() != table[funcName].funcParameters.size())
+    if (!table[funcName].info.is_function || inputVar.size() != table[funcName].funcParameters.size())
         return 0;
     for (int i = 0; i < inputVar.size(); i++)
     {

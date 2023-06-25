@@ -87,7 +87,7 @@ end             {token(END);}
 exit            {token(EXIT);}
 false           {
                 yylval.info.dType=type_bool;
-                yylval.info.boolValue=false;
+                yylval.info.value.boolValue=false;
                 token(FALSE);
                 }
 for             {token(FOR);}
@@ -116,7 +116,7 @@ string          {
 then            {token(THEN);}
 true            {
                 yylval.info.dType=type_bool;
-                yylval.info.boolValue=true;
+                yylval.info.value.boolValue=true;
                 token(TRUE);
                 }
 var             {token(VAR);}
@@ -134,7 +134,7 @@ when            {token(WHEN);}
                 int intNumber;
                 sscanf(yytext,"%d",&intNumber);
                 yylval.info.dType=type_int;
-                yylval.info.intValue=intNumber;
+                yylval.info.value.intValue=intNumber;
                 tokenInteger(INT_NUMBER,intNumber);
 }
 {numerical}     {
@@ -142,7 +142,7 @@ when            {token(WHEN);}
                 sscanf(yytext,"%lf",&doubleNumber);
                 printf("%f\n",doubleNumber);
                 yylval.info.dType=type_real;
-                yylval.info.doubleValue=doubleNumber;
+                yylval.info.value.doubleValue=doubleNumber;
                 tokenReal(REAL_NUMBER,doubleNumber);
                 }
 

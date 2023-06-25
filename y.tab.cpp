@@ -78,25 +78,13 @@ int currentStack=0;
 int stackNumber=0;
 
 
-vector<funcVar> functionVariable;
+vector<tokenInfo> functionVariable;
 stack<int> scopeStack;
 
 
+ofstream javaASM;
 
-struct tokenInfo
-{
-    char tokenID[256];
-    dataType dType;
-
-    int intValue;
-    double doubleValue;
-    bool boolValue;
-    char stringValue[256];
-};
-
-ofstream javaASS;
-
-#line 100 "y.tab.cpp" /* yacc.c:339  */
+#line 88 "y.tab.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -135,12 +123,12 @@ extern int yydebug;
     INT = 259,
     STRING = 260,
     BOOL = 261,
-    TRUE = 262,
-    FALSE = 263,
-    INT_NUMBER = 264,
-    REAL_NUMBER = 265,
-    STR = 266,
-    ID = 267,
+    ID = 262,
+    INT_NUMBER = 263,
+    REAL_NUMBER = 264,
+    STR = 265,
+    TRUE = 266,
+    FALSE = 267,
     ARRAY = 268,
     BEG = 269,
     CHAR = 270,
@@ -181,12 +169,12 @@ extern int yydebug;
 #define INT 259
 #define STRING 260
 #define BOOL 261
-#define TRUE 262
-#define FALSE 263
-#define INT_NUMBER 264
-#define REAL_NUMBER 265
-#define STR 266
-#define ID 267
+#define ID 262
+#define INT_NUMBER 263
+#define REAL_NUMBER 264
+#define STR 265
+#define TRUE 266
+#define FALSE 267
 #define ARRAY 268
 #define BEG 269
 #define CHAR 270
@@ -226,11 +214,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 36 "parser.y" /* yacc.c:355  */
- 
+#line 24 "parser.y" /* yacc.c:355  */
+
+    // string identity;
+    dataType dType;
     tokenInfo info;
 
-#line 234 "y.tab.cpp" /* yacc.c:355  */
+#line 224 "y.tab.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -247,7 +237,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 251 "y.tab.cpp" /* yacc.c:358  */
+#line 241 "y.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -549,16 +539,16 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    69,    69,    72,    73,    76,    77,    80,    81,    82,
-      83,    84,    87,    95,   102,   106,   112,   121,   122,   125,
-     132,   133,   134,   135,   139,   138,   150,   149,   176,   185,
-     196,   205,   214,   218,   217,   229,   228,   252,   253,   256,
-     257,   258,   259,   262,   263,   264,   269,   270,   275,   274,
-     295,   318,   319,   320,   321,   322,   323,   324,   332,   340,
-     341,   347,   353,   358,   364,   370,   371,   372,   376,   390,
-     406,   407,   408,   409,   410,   412,   413,   419,   425,   431,
-     437,   443,   449,   453,   459,   466,   482,   505,   513,   520,
-     524,   523,   545,   544,   565,   564,   585,   584,   612,   611
+       0,    59,    59,    62,    63,    66,    67,    70,    71,    72,
+      73,    74,    77,    91,   101,   109,   117,   131,   132,   135,
+     144,   145,   146,   147,   151,   150,   162,   161,   188,   197,
+     208,   217,   226,   230,   229,   241,   240,   264,   265,   268,
+     269,   270,   271,   274,   275,   276,   281,   282,   287,   286,
+     307,   330,   334,   335,   336,   337,   338,   339,   347,   355,
+     356,   362,   368,   373,   379,   385,   386,   387,   391,   405,
+     421,   422,   423,   424,   425,   427,   428,   434,   440,   446,
+     452,   458,   464,   468,   474,   481,   497,   520,   528,   535,
+     539,   538,   560,   559,   580,   579,   600,   599,   627,   626
 };
 #endif
 
@@ -567,8 +557,8 @@ static const yytype_uint16 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "REAL", "INT", "STRING", "BOOL", "TRUE",
-  "FALSE", "INT_NUMBER", "REAL_NUMBER", "STR", "ID", "ARRAY", "BEG",
+  "$end", "error", "$undefined", "REAL", "INT", "STRING", "BOOL", "ID",
+  "INT_NUMBER", "REAL_NUMBER", "STR", "TRUE", "FALSE", "ARRAY", "BEG",
   "CHAR", "DECREASING", "DEFAULT", "DO", "ELSE", "END", "EXIT", "FOR",
   "FUNCTION", "GET", "IF", "LOOP", "OF", "PUT", "PROCEDURE", "RESULT",
   "RETURN", "SKIP", "THEN", "VAR", "WHEN", "CONST", "ASSIGN", "MOD",
@@ -612,29 +602,29 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-    -106,    21,    67,  -106,    11,    13,    20,    52,   655,  -106,
-    -106,  -106,  -106,  -106,  -106,   -16,    10,   -18,   -15,  -106,
-    -106,  -106,  -106,  -106,   -27,  -106,    56,     8,    60,    60,
+    -106,    21,    67,  -106,    18,    24,    32,    58,   655,  -106,
+    -106,  -106,  -106,  -106,  -106,    19,    20,   -31,   -21,    36,
+    -106,  -106,  -106,  -106,  -106,  -106,    41,    12,    60,    60,
     -106,    60,    60,  -106,  -106,    60,    60,    60,  -106,  -106,
-    -106,   726,  -106,  -106,  -106,  -106,  -106,     4,     5,   173,
-     114,    60,   152,    60,    33,    91,   606,    60,    47,    98,
-     -40,   726,   726,    79,  -106,   726,   726,   754,  -106,   673,
-      57,    60,    60,    60,    60,    60,    60,    60,    60,    60,
-      60,    60,    60,    60,    61,    68,  -106,  -106,  -106,  -106,
-    -106,  -106,  -106,  -106,   173,    85,   726,    86,   726,  -106,
-     726,  -106,    66,  -106,  -106,  -106,   106,  -106,   650,    60,
-      75,   111,   165,  -106,  -106,  -106,    25,    25,    25,   754,
-     740,    25,    25,    25,    43,    43,  -106,  -106,   134,   102,
-      23,  -106,    27,    80,   173,    60,    42,  -106,  -106,   692,
-      60,  -106,  -106,   107,  -106,   173,  -106,   129,  -106,  -106,
-    -106,    90,   132,   214,  -106,    94,  -106,   726,  -106,    60,
-      95,   709,   263,   312,  -106,   108,   112,  -106,   102,   113,
-     155,  -106,   173,   726,    60,   110,   606,   135,   116,   175,
-     361,  -106,   148,  -106,   410,   151,   726,    60,   172,  -106,
-     173,   182,  -106,   173,  -106,   186,   152,  -106,   726,   177,
-     176,  -106,   459,   146,  -106,  -106,   508,  -106,  -106,   152,
-     192,   153,   183,   557,  -106,  -106,   173,  -106,   184,   181,
-    -106,   152,  -106
+    -106,   726,  -106,  -106,  -106,  -106,  -106,     7,     8,   172,
+     134,    60,   122,    60,    33,    71,   606,    60,    27,    74,
+     -38,   726,   726,    50,  -106,   726,   726,   754,  -106,   673,
+      28,    60,    60,    60,    60,    60,    60,    60,    60,    60,
+      60,    60,    60,    60,    40,    42,  -106,  -106,  -106,  -106,
+    -106,  -106,  -106,  -106,   172,    61,   726,    77,   726,  -106,
+     726,  -106,    59,  -106,  -106,  -106,    79,  -106,   650,    60,
+      64,    99,   165,  -106,  -106,  -106,    72,    72,    72,   754,
+     740,    72,    72,    72,    62,    62,  -106,  -106,   148,   102,
+     -33,  -106,   -22,    80,   172,    60,     4,  -106,  -106,   692,
+      60,  -106,  -106,   105,  -106,   172,  -106,   126,  -106,  -106,
+    -106,    88,   136,   214,  -106,    90,  -106,   726,  -106,    60,
+      94,   709,   263,   312,  -106,    95,   107,  -106,   102,   109,
+     157,  -106,   172,   726,    60,   112,   606,   142,   116,   175,
+     361,  -106,   152,  -106,   410,   151,   726,    60,   174,  -106,
+     172,   185,  -106,   172,  -106,   191,   122,  -106,   726,   177,
+     173,  -106,   459,   149,  -106,  -106,   508,  -106,  -106,   122,
+     197,   153,   183,   557,  -106,  -106,   172,  -106,   184,   181,
+    -106,   122,  -106
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -643,8 +633,8 @@ static const yytype_int16 yypact[] =
 static const yytype_uint8 yydefact[] =
 {
        4,     0,     6,     1,     0,     0,     0,     0,     2,     3,
-       7,     8,     9,    10,    11,     0,     0,     0,     0,    73,
-      74,    70,    71,    72,    69,    48,    55,     0,     0,     0,
+       7,     8,     9,    10,    11,     0,     0,     0,     0,    69,
+      70,    71,    72,    73,    74,    48,    55,     0,     0,     0,
       94,     0,     0,    54,    57,     0,     0,     0,     5,    43,
       44,    45,    66,    65,    67,    46,    47,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
@@ -672,7 +662,7 @@ static const yytype_int16 yypgoto[] =
 {
     -106,  -106,  -106,  -106,  -106,   208,   209,    44,     1,   -50,
     -106,  -106,  -106,   167,   125,  -106,  -106,  -106,  -105,   -47,
-     210,  -106,  -106,  -106,   -24,   -48,   -23,  -106,  -106,  -106,
+     210,  -106,  -106,  -106,   -24,   -48,   -19,  -106,  -106,  -106,
     -106,  -106,  -106,  -106,  -106,  -106,  -106
 };
 
@@ -690,27 +680,27 @@ static const yytype_int16 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int16 yytable[] =
 {
-      95,    89,    97,    12,    61,    62,    63,    65,    66,   106,
-      53,    67,    68,    69,    70,    54,    84,    84,    55,    49,
-      58,     3,    51,    15,    59,    16,   153,    96,    54,    98,
-     100,    55,    17,    62,   108,    50,   162,   163,    52,    47,
-      19,    20,    21,    22,    23,    60,   133,   115,   116,   117,
+      95,    89,    97,    12,    61,    62,    49,    65,    66,   106,
+      63,    67,    68,    69,    84,    84,    51,    54,    70,    58,
+      55,     3,    50,   151,   152,    15,   153,    96,    59,    98,
+     100,    16,    52,    62,   154,   152,   162,   163,   108,    17,
+      60,    20,    21,    22,    23,    24,   133,   115,   116,   117,
      118,   119,   120,   121,   122,   123,   124,   125,   126,   127,
-      85,    87,   180,    71,    18,    48,   184,    19,    20,    21,
-      22,    23,    60,    80,    81,    82,    83,    35,   146,   151,
-     152,    71,    36,   154,   152,   139,   156,   202,    37,    99,
-       4,    57,   206,    82,    83,   102,     5,   165,   158,   159,
-     109,     6,   213,     7,    35,    90,    91,    92,    93,    36,
-     110,   157,   111,   114,   128,    37,   161,    90,    91,    92,
-      93,   129,   134,   135,   185,   137,   138,    94,   140,   188,
-     149,   -92,   194,   164,   155,   173,   147,    90,    91,    92,
-      93,   166,   200,   168,   169,   203,   205,   145,   172,   174,
+     158,   159,   180,    85,    87,    18,   184,    60,    20,    21,
+      22,    23,    24,    53,    47,    48,    57,    35,   146,   102,
+     109,   110,    36,   111,   114,   139,   156,   202,    37,    99,
+       4,    54,   206,   128,    55,   129,     5,   165,   134,   138,
+      71,     6,   213,     7,    35,    90,    91,    92,    93,    36,
+      71,   157,    82,    83,   135,    37,   161,   140,   137,   -92,
+      80,    81,    82,    83,   185,    90,    91,    92,    93,   188,
+     149,   164,   194,   166,   155,   173,   147,    90,    91,    92,
+      93,   168,   200,   169,   172,   203,   205,    94,   174,   178,
      186,    90,    91,    92,    93,    90,    91,    92,    93,   214,
-     189,   193,   178,   198,   187,   179,   182,   183,   219,   149,
+     179,   145,   182,   198,   183,   193,   187,   189,   219,   149,
      190,   222,    19,    20,    21,    22,    23,    24,   196,    25,
-      19,    20,    21,    22,    23,   143,    26,    27,    94,    28,
-      29,    30,   199,    31,   201,    32,    33,    34,   204,     6,
-     211,     7,   208,   209,   215,   217,   220,   216,   221,    35,
+      20,    21,    22,    23,    24,   143,    26,    27,    94,    28,
+      29,    30,   201,    31,   199,    32,    33,    34,   204,     6,
+     209,     7,   208,   211,   215,   217,   220,   216,   221,    35,
       10,    11,   181,   132,    36,    88,     0,     0,    38,     0,
       37,    19,    20,    21,    22,    23,    24,     0,    25,     0,
        0,     0,     0,     0,   170,    26,    27,     0,    28,    29,
@@ -775,27 +765,27 @@ static const yytype_int16 yytable[] =
 
 static const yytype_int16 yycheck[] =
 {
-      50,    49,    52,     2,    28,    29,    29,    31,    32,    56,
-      37,    35,    36,    37,    37,    55,    12,    12,    58,    37,
-      12,     0,    37,    12,    16,    12,   131,    51,    55,    53,
-      54,    58,    12,    57,    57,    53,   141,   142,    53,    55,
+      50,    49,    52,     2,    28,    29,    37,    31,    32,    56,
+      29,    35,    36,    37,     7,     7,    37,    55,    37,     7,
+      58,     0,    53,    56,    57,     7,   131,    51,    16,    53,
+      54,     7,    53,    57,    56,    57,   141,   142,    57,     7,
        7,     8,     9,    10,    11,    12,    94,    71,    72,    73,
       74,    75,    76,    77,    78,    79,    80,    81,    82,    83,
-      56,    56,   167,    38,    12,    55,   171,     7,     8,     9,
-      10,    11,    12,    48,    49,    50,    51,    44,   128,    56,
-      57,    38,    49,    56,    57,   109,   134,   192,    55,    56,
-      23,    35,   197,    50,    51,     4,    29,   145,    56,    57,
-      53,    34,   207,    36,    44,     3,     4,     5,     6,    49,
-      12,   135,    33,    56,    53,    55,   140,     3,     4,     5,
-       6,    53,    37,    37,   172,    59,    20,    13,    53,   176,
-     129,    20,   182,    26,    54,   159,    34,     3,     4,     5,
-       6,    12,   190,    53,    12,   193,   196,    13,    54,    54,
+      56,    57,   167,    56,    56,     7,   171,     7,     8,     9,
+      10,    11,    12,    37,    55,    55,    35,    44,   128,     8,
+      53,     7,    49,    33,    56,   109,   134,   192,    55,    56,
+      23,    55,   197,    53,    58,    53,    29,   145,    37,    20,
+      38,    34,   207,    36,    44,     3,     4,     5,     6,    49,
+      38,   135,    50,    51,    37,    55,   140,    53,    59,    20,
+      48,    49,    50,    51,   172,     3,     4,     5,     6,   176,
+     129,    26,   182,     7,    54,   159,    34,     3,     4,     5,
+       6,    53,   190,     7,    54,   193,   196,    13,    54,    54,
      174,     3,     4,     5,     6,     3,     4,     5,     6,   209,
-      25,    13,    54,   187,    54,    53,    53,    12,   216,   168,
+      53,    13,    53,   187,     7,    13,    54,    25,   216,   168,
       54,   221,     7,     8,     9,    10,    11,    12,    27,    14,
-       7,     8,     9,    10,    11,    20,    21,    22,    13,    24,
-      25,    26,    20,    28,    12,    30,    31,    32,    12,    34,
-      54,    36,    25,    27,    12,    22,    22,    54,    27,    44,
+       8,     9,    10,    11,    12,    20,    21,    22,    13,    24,
+      25,    26,     7,    28,    20,    30,    31,    32,     7,    34,
+      27,    36,    25,    54,     7,    22,    22,    54,    27,    44,
        2,     2,   168,    88,    49,    48,    -1,    -1,     8,    -1,
       55,     7,     8,     9,    10,    11,    12,    -1,    14,    -1,
       -1,    -1,    -1,    -1,    20,    21,    22,    -1,    24,    25,
@@ -863,27 +853,27 @@ static const yytype_int16 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,    61,    62,     0,    23,    29,    34,    36,    63,    64,
-      65,    66,    68,    70,    75,    12,    12,    12,    12,     7,
+      65,    66,    68,    70,    75,     7,     7,     7,     7,     7,
        8,     9,    10,    11,    12,    14,    21,    22,    24,    25,
       26,    28,    30,    31,    32,    44,    49,    55,    80,    81,
       83,    84,    85,    86,    87,    90,    93,    55,    55,    37,
-      53,    37,    53,    37,    55,    58,    82,    35,    12,    16,
-      12,    84,    84,    86,    94,    84,    84,    84,    84,    84,
+      53,    37,    53,    37,    55,    58,    82,    35,     7,    16,
+       7,    84,    84,    86,    94,    84,    84,    84,    84,    84,
       86,    38,    39,    40,    41,    42,    43,    45,    46,    47,
-      48,    49,    50,    51,    12,    56,    73,    56,    73,    85,
+      48,    49,    50,    51,     7,    56,    73,    56,    73,    85,
        3,     4,     5,     6,    13,    69,    84,    69,    84,    56,
-      84,    88,     4,    65,    66,    68,    79,    80,    86,    53,
-      12,    33,    78,    56,    56,    84,    84,    84,    84,    84,
+      84,    88,     8,    65,    66,    68,    79,    80,    86,    53,
+       7,    33,    78,    56,    56,    84,    84,    84,    84,    84,
       84,    84,    84,    84,    84,    84,    84,    84,    53,    53,
       74,    76,    74,    85,    37,    37,    89,    59,    20,    84,
       53,    91,    92,    20,    79,    13,    69,    34,    67,    68,
       69,    56,    57,    78,    56,    54,    85,    84,    56,    57,
-      54,    84,    78,    78,    26,    85,    12,    71,    53,    12,
+      54,    84,    78,    78,    26,    85,     7,    71,    53,     7,
       20,    77,    54,    84,    54,    54,    19,    20,    54,    53,
-      78,    67,    53,    12,    78,    85,    84,    54,    79,    25,
+      78,    67,    53,     7,    78,    85,    84,    54,    79,    25,
       54,    20,    72,    13,    69,    20,    27,    95,    84,    20,
-      85,    12,    78,    85,    12,    69,    78,    96,    25,    27,
-      20,    54,    20,    78,    69,    12,    54,    22,    20,    85,
+      85,     7,    78,    85,     7,    69,    78,    96,    25,    27,
+      20,    54,    20,    78,    69,     7,    54,    22,    20,    85,
       22,    27,    69
 };
 
@@ -1591,772 +1581,802 @@ yyreduce:
   switch (yyn)
     {
         case 12:
-#line 88 "parser.y" /* yacc.c:1646  */
+#line 78 "parser.y" /* yacc.c:1646  */
     {
-                    if((yyvsp[-2].info).info.dType!=(yyvsp[0].info).info.dType)
+                    if((yyvsp[-4].info).dType!=(yyvsp[0].info).dType)
                         yyerror("ERROR: const assign type error");
                     else
-                        s_table.insert((yyvsp[-4].info),tokenID,intToType((yyvsp[-2].info).dType),is_constant,currentStack);
+                    {
+                        tokenInfo t;
+                        strcpy(t.tokenID,(yyvsp[-4].info).tokenID);
+                        t.is_const=1;
+                        copyTokenInfo(t,(yyvsp[0].info));
+                        s_table.insert(t,currentStack);
+                    }
                 }
-#line 1602 "y.tab.cpp" /* yacc.c:1646  */
+#line 1598 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 96 "parser.y" /* yacc.c:1646  */
+#line 92 "parser.y" /* yacc.c:1646  */
     {
-                    
-                    s_table.insert((yyvsp[-2].info),intToType((yyvsp[0].info)),is_constant,currentStack);
+                    tokenInfo t;
+                    strcpy(t.tokenID,(yyvsp[-2].info).tokenID);
+                    t.is_const=1;
+                    copyTokenInfo(t,(yyvsp[0].info));
+                    s_table.insert(t,currentStack);
                 }
-#line 1611 "y.tab.cpp" /* yacc.c:1646  */
+#line 1610 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 103 "parser.y" /* yacc.c:1646  */
+#line 102 "parser.y" /* yacc.c:1646  */
     {
-                    s_table.insert((yyvsp[-2].info),intToType((yyvsp[0].info)),is_normal,currentStack);
+                    tokenInfo t;
+                    // strcpy(t.tokenID,$2.tokenID);
+                    (yyvsp[-2].info).dType=(yyvsp[0].dType);
+                    // t.dType=$4;
+                    s_table.insert((yyvsp[-2].info),currentStack);
                 }
-#line 1619 "y.tab.cpp" /* yacc.c:1646  */
+#line 1622 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 107 "parser.y" /* yacc.c:1646  */
+#line 110 "parser.y" /* yacc.c:1646  */
     {
                     // if($4!=$6)
-                    //     yyerror("ERROR: const assign type error");
-                    s_table.insert((yyvsp[-2].info),intToType((yyvsp[0].info)),is_normal,currentStack);
+                    //     yyerror("ERROR: var assign type error");
+                    (yyvsp[-2].info).dType=(yyvsp[0].info).dType;
+                    (yyvsp[-2].info).value=(yyvsp[0].info).value;
+                    s_table.insert((yyvsp[-2].info),currentStack);
                 }
-#line 1629 "y.tab.cpp" /* yacc.c:1646  */
+#line 1634 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 113 "parser.y" /* yacc.c:1646  */
+#line 118 "parser.y" /* yacc.c:1646  */
     {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
+                    if((yyvsp[-2].dType)!=(yyvsp[0].info).dType)
                         yyerror("ERROR: const assign type error");
-                    s_table.insert((yyvsp[-4].info),intToType((yyvsp[-2].info)),is_normal,currentStack);
+                    else
+                    {
+                        (yyvsp[-4].info).dType=(yyvsp[-2].dType);
+                        (yyvsp[-4].info).value=(yyvsp[0].info).value;
+                        s_table.insert((yyvsp[-4].info),currentStack);
+                    }
                 }
-#line 1639 "y.tab.cpp" /* yacc.c:1646  */
+#line 1649 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 121 "parser.y" /* yacc.c:1646  */
-    {(yyval.info)=(yyvsp[0].info);}
-#line 1645 "y.tab.cpp" /* yacc.c:1646  */
+#line 131 "parser.y" /* yacc.c:1646  */
+    {(yyval.dType)=(yyvsp[0].dType);}
+#line 1655 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 122 "parser.y" /* yacc.c:1646  */
-    {(yyval.info)=(yyvsp[0].info);}
-#line 1651 "y.tab.cpp" /* yacc.c:1646  */
+#line 132 "parser.y" /* yacc.c:1646  */
+    {(yyval.dType)=(yyvsp[0].info).dType;}
+#line 1661 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 126 "parser.y" /* yacc.c:1646  */
+#line 136 "parser.y" /* yacc.c:1646  */
     {
-                    s_table.insert((yyvsp[-8].info),intToType((yyvsp[0].info)),is_arr,currentStack);
-                    (yyval.info) = (yyvsp[0].info);
+                    (yyvsp[-8].info).dType=(yyvsp[0].dType);
+                    (yyvsp[-8].info).is_array=1;
+                    s_table.insert((yyvsp[-8].info),currentStack);
+                    copyTokenInfo((yyval.info),(yyvsp[-8].info));
                 }
-#line 1660 "y.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 20:
-#line 132 "parser.y" /* yacc.c:1646  */
-    {(yyval.info)=(yyvsp[0].info);}
-#line 1666 "y.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 21:
-#line 133 "parser.y" /* yacc.c:1646  */
-    {(yyval.info)=(yyvsp[0].info);}
 #line 1672 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 22:
-#line 134 "parser.y" /* yacc.c:1646  */
-    {(yyval.info)=(yyvsp[0].info);}
+  case 20:
+#line 144 "parser.y" /* yacc.c:1646  */
+    {(yyval.dType)=(yyvsp[0].dType);}
 #line 1678 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 23:
-#line 135 "parser.y" /* yacc.c:1646  */
-    {(yyval.info)=(yyvsp[0].info);}
+  case 21:
+#line 145 "parser.y" /* yacc.c:1646  */
+    {(yyval.dType)=(yyvsp[0].dType);}
 #line 1684 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
+  case 22:
+#line 146 "parser.y" /* yacc.c:1646  */
+    {(yyval.dType)=(yyvsp[0].dType);}
+#line 1690 "y.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 23:
+#line 147 "parser.y" /* yacc.c:1646  */
+    {(yyval.dType)=(yyvsp[0].dType);}
+#line 1696 "y.tab.cpp" /* yacc.c:1646  */
+    break;
+
   case 24:
-#line 139 "parser.y" /* yacc.c:1646  */
+#line 151 "parser.y" /* yacc.c:1646  */
     {
-                    s_table.insert((yyvsp[-4].info),intToType((yyvsp[0].info)),is_func,0);
-                    s_table.table[(yyvsp[-4].info)].fData.varNumber=0;
-                    currentStack=++stackNumber;    
+                    // s_table.insert($2,intToType($6),is_func,0);
+                    // s_table.table[$2].fData.varNumber=0;
+                    // currentStack=++stackNumber;    
                 }
-#line 1694 "y.tab.cpp" /* yacc.c:1646  */
+#line 1706 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 146 "parser.y" /* yacc.c:1646  */
+#line 158 "parser.y" /* yacc.c:1646  */
     {
-                    currentStack=0;
+                    // currentStack=0;
                 }
-#line 1702 "y.tab.cpp" /* yacc.c:1646  */
+#line 1714 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 150 "parser.y" /* yacc.c:1646  */
+#line 162 "parser.y" /* yacc.c:1646  */
     {
-                    // s_table.insert($2,intToType($9),is_func,0);
-                    // {currentStack=++stackNumber;}
-                    s_table.insert((yyvsp[-6].info),intToType((yyvsp[0].info)),is_func,0);
-                    currentStack=++stackNumber;
-                    for(auto &fVar:functionVariable)
-                    {
-                        s_table.table[(yyvsp[-6].info)].fData.functionVar.push_back(fVar.funcVarType);
-                        //insert variable in functionData
+                    // // s_table.insert($2,intToType($9),is_func,0);
+                    // // {currentStack=++stackNumber;}
+                    // s_table.insert($2,intToType($8),is_func,0);
+                    // currentStack=++stackNumber;
+                    // for(auto &fVar:functionVariable)
+                    // {
+                    //     s_table.table[$2].fData.functionVar.push_back(fVar.funcVarType);
+                    //     //insert variable in functionData
 
-                        s_table.insert(fVar.varID,fVar.funcVarType,fVar.isArray? is_arr:is_normal,currentStack);
-                        //insert variable to symbolTable
-                    }
-                    s_table.table[(yyvsp[-6].info)].fData.varNumber=functionVariable.size();
+                    //     s_table.insert(fVar.varID,fVar.funcVarType,fVar.isArray? is_arr:is_normal,currentStack);
+                    //     //insert variable to symbolTable
+                    // }
+                    // s_table.table[$2].fData.varNumber=functionVariable.size();
 
                 }
-#line 1723 "y.tab.cpp" /* yacc.c:1646  */
+#line 1735 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 168 "parser.y" /* yacc.c:1646  */
+#line 180 "parser.y" /* yacc.c:1646  */
     {
-                    currentStack=0;
-                    functionVariable.clear();
+                    // currentStack=0;
+                    // functionVariable.clear();
                 }
-#line 1732 "y.tab.cpp" /* yacc.c:1646  */
+#line 1744 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 177 "parser.y" /* yacc.c:1646  */
+#line 189 "parser.y" /* yacc.c:1646  */
     {
-                    // s_table.insert($1,intToType($3),is_normal,currentStack);
-                    funcVar temp;
-                    temp.varID=(yyvsp[-2].info);
-                    temp.funcVarType=intToType((yyvsp[0].info));
-                    temp.isArray=0;
-                    functionVariable.push_back(temp);
+                    // // s_table.insert($1,intToType($3),is_normal,currentStack);
+                    // funcVar temp;
+                    // temp.varID=$1;
+                    // temp.funcVarType=intToType($3);
+                    // temp.isArray=0;
+                    // functionVariable.push_back(temp);
                 }
-#line 1745 "y.tab.cpp" /* yacc.c:1646  */
+#line 1757 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 186 "parser.y" /* yacc.c:1646  */
+#line 198 "parser.y" /* yacc.c:1646  */
     {
                     // s_table.insert($1,intToType($9),is_arr,currentStack);
-                    funcVar temp;
-                    temp.varID=(yyvsp[-8].info);
-                    temp.funcVarType=intToType((yyvsp[0].info));
-                    temp.isArray=1;
-                    functionVariable.push_back(temp);
+                    // funcVar temp;
+                    // temp.varID=$1;
+                    // temp.funcVarType=intToType($9);
+                    // temp.isArray=1;
+                    // functionVariable.push_back(temp);
                 }
-#line 1758 "y.tab.cpp" /* yacc.c:1646  */
+#line 1770 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 197 "parser.y" /* yacc.c:1646  */
+#line 209 "parser.y" /* yacc.c:1646  */
     {
-                    // s_table.insert($3,intToType($5),is_normal,currentStack);
-                    funcVar temp;
-                    temp.varID=(yyvsp[-2].info);
-                    temp.funcVarType=intToType((yyvsp[0].info));
-                    temp.isArray=0;
-                    functionVariable.push_back(temp);
+                    // // s_table.insert($3,intToType($5),is_normal,currentStack);
+                    // funcVar temp;
+                    // temp.varID=$3;
+                    // temp.funcVarType=intToType($5);
+                    // temp.isArray=0;
+                    // functionVariable.push_back(temp);
                 }
-#line 1771 "y.tab.cpp" /* yacc.c:1646  */
+#line 1783 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 206 "parser.y" /* yacc.c:1646  */
+#line 218 "parser.y" /* yacc.c:1646  */
     {
-                    // s_table.insert($3,intToType($11),is_arr,currentStack);
-                    funcVar temp;
-                    temp.varID=(yyvsp[-8].info);
-                    temp.funcVarType=intToType((yyvsp[0].info));
-                    temp.isArray=1;
-                    functionVariable.push_back(temp);
+                    // // s_table.insert($3,intToType($11),is_arr,currentStack);
+                    // funcVar temp;
+                    // temp.varID=$3;
+                    // temp.funcVarType=intToType($11);
+                    // temp.isArray=1;
+                    // functionVariable.push_back(temp);
                 }
-#line 1784 "y.tab.cpp" /* yacc.c:1646  */
+#line 1796 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 218 "parser.y" /* yacc.c:1646  */
+#line 230 "parser.y" /* yacc.c:1646  */
     {
-                    s_table.insert((yyvsp[-2].info),type_null,is_func,0);
-                    currentStack=++stackNumber;
+                    // s_table.insert($2,type_null,is_func,0);
+                    // currentStack=++stackNumber;
 
                 }
-#line 1794 "y.tab.cpp" /* yacc.c:1646  */
+#line 1806 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 225 "parser.y" /* yacc.c:1646  */
+#line 237 "parser.y" /* yacc.c:1646  */
     {
-                    currentStack=0;
+                    // currentStack=0;
                 }
-#line 1802 "y.tab.cpp" /* yacc.c:1646  */
+#line 1814 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 229 "parser.y" /* yacc.c:1646  */
+#line 241 "parser.y" /* yacc.c:1646  */
     {
-                    // s_table.insert($2,intToType($9),is_func,0);
-                    // {currentStack=++stackNumber;}
-                    s_table.insert((yyvsp[-4].info),type_null,is_func,0);
-                    currentStack=++stackNumber;
-                    for(auto &fVar:functionVariable)
-                    {
-                        s_table.table[(yyvsp[-4].info)].fData.functionVar.push_back(fVar.funcVarType);
-                        //insert variable to function Data
+                    // // s_table.insert($2,intToType($9),is_func,0);
+                    // // {currentStack=++stackNumber;}
+                    // s_table.insert($2,type_null,is_func,0);
+                    // currentStack=++stackNumber;
+                    // for(auto &fVar:functionVariable)
+                    // {
+                    //     s_table.table[$2].fData.functionVar.push_back(fVar.funcVarType);
+                    //     //insert variable to function Data
 
-                        s_table.insert(fVar.varID,fVar.funcVarType,fVar.isArray? is_arr:is_normal,currentStack);
-                        //insert variable to symbolTable
-                    }
-                    s_table.table[(yyvsp[-4].info)].fData.varNumber=functionVariable.size();
+                    //     s_table.insert(fVar.varID,fVar.funcVarType,fVar.isArray? is_arr:is_normal,currentStack);
+                    //     //insert variable to symbolTable
+                    // }
+                    // s_table.table[$2].fData.varNumber=functionVariable.size();
                 }
-#line 1822 "y.tab.cpp" /* yacc.c:1646  */
+#line 1834 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 246 "parser.y" /* yacc.c:1646  */
+#line 258 "parser.y" /* yacc.c:1646  */
     {
-                    currentStack=0;
-                    functionVariable.clear();
+                    // currentStack=0;
+                    // functionVariable.clear();
                 }
-#line 1831 "y.tab.cpp" /* yacc.c:1646  */
+#line 1843 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 275 "parser.y" /* yacc.c:1646  */
+#line 287 "parser.y" /* yacc.c:1646  */
     {
-                    scopeStack.push(currentStack);
-                    currentStack=++stackNumber;
-                    s_table.insertStack(scopeStack.top(),currentStack);
+                    // scopeStack.push(currentStack);
+                    // currentStack=++stackNumber;
+                    // s_table.insertStack(scopeStack.top(),currentStack);
                 }
-#line 1841 "y.tab.cpp" /* yacc.c:1646  */
+#line 1853 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 282 "parser.y" /* yacc.c:1646  */
+#line 294 "parser.y" /* yacc.c:1646  */
     {
-                    if(scopeStack.empty())
-                    {
-                        currentStack=0;
-                    }
-                    else
-                    {
-                        currentStack=scopeStack.top();
-                        scopeStack.pop();
-                    }
+                    // if(scopeStack.empty())
+                    // {
+                    //     currentStack=0;
+                    // }
+                    // else
+                    // {
+                    //     currentStack=scopeStack.top();
+                    //     scopeStack.pop();
+                    // }
                 }
-#line 1857 "y.tab.cpp" /* yacc.c:1646  */
+#line 1869 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 296 "parser.y" /* yacc.c:1646  */
+#line 308 "parser.y" /* yacc.c:1646  */
     {
-                    if(s_table.lookup((yyvsp[-2].info))==0)
-                    //symbol is not declare
-                    {
-                        printf("ERROR: %s not declare\n",(yyvsp[-2].info));
-                    }
-                    else if(s_table.table[(yyvsp[-2].info)].masterType==is_constant)
-                    //symbol is constant
-                    {
-                        printf("ERROR %s is constant unable to assign\n",(yyvsp[-2].info));
-                    }
-                    else if(s_table.table[(yyvsp[-2].info)].type!=(yyvsp[0].info))
-                    //type error
-                    {
-                        printf("ERROR: %s assign type error\n",(yyvsp[-2].info));
-                    }
-                    else if(s_table.canAccess((yyvsp[-2].info),currentStack)==0)
-                    {
-                        printf("ERROR: %s is unable to access\n",(yyvsp[-2].info));
-                    }   
+                    // if(s_table.lookup($1)==0)
+                    // //symbol is not declare
+                    // {
+                    //     printf("ERROR: %s not declare\n",$1);
+                    // }
+                    // else if(s_table.table[$1].masterType==is_constant)
+                    // //symbol is constant
+                    // {
+                    //     printf("ERROR %s is constant unable to assign\n",$1);
+                    // }
+                    // else if(s_table.table[$1].type!=$3)
+                    // //type error
+                    // {
+                    //     printf("ERROR: %s assign type error\n",$1);
+                    // }
+                    // else if(s_table.canAccess($1,currentStack)==0)
+                    // {
+                    //     printf("ERROR: %s is unable to access\n",$1);
+                    // }   
 
                 }
-#line 1884 "y.tab.cpp" /* yacc.c:1646  */
+#line 1896 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 57:
-#line 325 "parser.y" /* yacc.c:1646  */
+  case 51:
+#line 331 "parser.y" /* yacc.c:1646  */
     {
-
-                }
-#line 1892 "y.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 58:
-#line 333 "parser.y" /* yacc.c:1646  */
-    {
-                    if((yyvsp[0].info)!=type_int && (yyvsp[0].info)!=type_real)
-                    {
-                        printf("ERROR: %d unable to calculate negetive\n",(yyvsp[0].info));
-                    }
-                    (yyval.info)=(yyvsp[0].info);
+                    javaASM<<"  getstatic java.io.PrintStream java.lang.System.out"<<endl;
                 }
 #line 1904 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 59:
+  case 57:
 #line 340 "parser.y" /* yacc.c:1646  */
-    {(yyval.info)=(yyvsp[-1].info);}
-#line 1910 "y.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 60:
-#line 342 "parser.y" /* yacc.c:1646  */
     {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR: expression '*' type error");
-                    (yyval.info)=(yyvsp[-2].info);
+                    javaASM<<"getstatic java.io.PrintStream java.lang.System.out\ninvokevirtual void java.io.PrintStream.println()"<<endl;
                 }
-#line 1920 "y.tab.cpp" /* yacc.c:1646  */
+#line 1912 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 61:
+  case 58:
 #line 348 "parser.y" /* yacc.c:1646  */
     {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR: expression '/' type error");
-                    (yyval.info)=(yyvsp[-2].info);
+                    // if($2!=type_int && $2!=type_real)
+                    // {
+                    //     printf("ERROR: %d unable to calculate negetive\n",$2);
+                    // }
+                    // $$=$2;
                 }
+#line 1924 "y.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 59:
+#line 355 "parser.y" /* yacc.c:1646  */
+    {(yyval.info)=(yyvsp[-1].info);}
 #line 1930 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 62:
-#line 353 "parser.y" /* yacc.c:1646  */
+  case 60:
+#line 357 "parser.y" /* yacc.c:1646  */
     {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR: expression '%' type error");
-                    (yyval.info)=(yyvsp[-2].info);
+                    // if($1!=$3)
+                    //     yyerror("ERROR: expression '*' type error");
+                    // $$=$1;
                 }
 #line 1940 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 63:
-#line 359 "parser.y" /* yacc.c:1646  */
+  case 61:
+#line 363 "parser.y" /* yacc.c:1646  */
     {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR: expression '+' type error");
-                    (yyval.info)=(yyvsp[-2].info);
+                    // if($1!=$3)
+                    //     yyerror("ERROR: expression '/' type error");
+                    // $$=$1;
                 }
 #line 1950 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 64:
-#line 365 "parser.y" /* yacc.c:1646  */
+  case 62:
+#line 368 "parser.y" /* yacc.c:1646  */
     {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR: expression '-' type error");
-                    (yyval.info)=(yyvsp[-2].info);
+                    // if($1!=$3)
+                    //     yyerror("ERROR: expression '%' type error");
+                    // $$=$1;
                 }
 #line 1960 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 65:
-#line 370 "parser.y" /* yacc.c:1646  */
-    {(yyval.info)=(yyvsp[0].info);}
-#line 1966 "y.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 66:
-#line 371 "parser.y" /* yacc.c:1646  */
-    {(yyval.info)=(yyvsp[0].info);}
-#line 1972 "y.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 67:
-#line 373 "parser.y" /* yacc.c:1646  */
+  case 63:
+#line 374 "parser.y" /* yacc.c:1646  */
     {
-                    functionVariable.clear();
+                    // if($1!=$3)
+                    //     yyerror("ERROR: expression '+' type error");
+                    // $$=$1;
+                }
+#line 1970 "y.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 64:
+#line 380 "parser.y" /* yacc.c:1646  */
+    {
+                    // if($1!=$3)
+                    //     yyerror("ERROR: expression '-' type error");
+                    // $$=$1;
                 }
 #line 1980 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 68:
-#line 377 "parser.y" /* yacc.c:1646  */
+  case 65:
+#line 385 "parser.y" /* yacc.c:1646  */
+    {(yyval.info)=(yyvsp[0].info);}
+#line 1986 "y.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 66:
+#line 386 "parser.y" /* yacc.c:1646  */
+    {(yyval.info)=(yyvsp[0].info);}
+#line 1992 "y.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 67:
+#line 388 "parser.y" /* yacc.c:1646  */
     {
-                    if(s_table.lookup((yyvsp[-3].info))==0)
-                    {
-                        printf("ERROR: ID %s not found\n",(yyvsp[-3].info));
-                    }
-                    else if(s_table.canAccess((yyvsp[-3].info),currentStack)==0)
-                    {
-                        printf("ERROR: %s is unable to reach\n",(yyvsp[-3].info));
-                        (yyval.info)=s_table.table[(yyvsp[-3].info)].type;
-                    }
-                    else
-                        (yyval.info)=s_table.table[(yyvsp[-3].info)].type;
+                    // functionVariable.clear();
                 }
-#line 1998 "y.tab.cpp" /* yacc.c:1646  */
+#line 2000 "y.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 68:
+#line 392 "parser.y" /* yacc.c:1646  */
+    {
+                    // if(s_table.lookup($1)==0)
+                    // {
+                    //     printf("ERROR: ID %s not found\n",$1);
+                    // }
+                    // else if(s_table.canAccess($1,currentStack)==0)
+                    // {
+                    //     printf("ERROR: %s is unable to reach\n",$1);
+                    //     $$=s_table.table[$1].type;
+                    // }
+                    // else
+                    //     $$=s_table.table[$1].type;
+                }
+#line 2018 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 391 "parser.y" /* yacc.c:1646  */
+#line 406 "parser.y" /* yacc.c:1646  */
     {
-                    if(s_table.lookup((yyvsp[0].info))==0)
-                    {
-                        printf("ERROR: ID %s not found\n",(yyvsp[0].info));
-                    }
-                    else if(s_table.canAccess((yyvsp[0].info),currentStack)==0)
-                    {
+                    // if(s_table.lookup($1)==0)
+                    // {
+                    //     printf("ERROR: ID %s not found\n",$1);
+                    // }
+                    // else if(s_table.canAccess($1,currentStack)==0)
+                    // {
 
-                        printf("ERROR: %s stack: %d is unable to reach\n",(yyvsp[0].info),currentStack);
-                        (yyval.info)=s_table.table[(yyvsp[0].info)].type;
-                    }
-                    else
-                        (yyval.info)=s_table.table[(yyvsp[0].info)].type;
+                    //     printf("ERROR: %s stack: %d is unable to reach\n",$1,currentStack);
+                    //     $$=s_table.table[$1].type;
+                    // }
+                    // else
+                    //     $$=s_table.table[$1].type;
                 }
-#line 2017 "y.tab.cpp" /* yacc.c:1646  */
+#line 2037 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 406 "parser.y" /* yacc.c:1646  */
+#line 421 "parser.y" /* yacc.c:1646  */
     {(yyval.info)=(yyvsp[0].info);}
-#line 2023 "y.tab.cpp" /* yacc.c:1646  */
+#line 2043 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 407 "parser.y" /* yacc.c:1646  */
+#line 422 "parser.y" /* yacc.c:1646  */
     {(yyval.info)=(yyvsp[0].info);}
-#line 2029 "y.tab.cpp" /* yacc.c:1646  */
+#line 2049 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 408 "parser.y" /* yacc.c:1646  */
+#line 423 "parser.y" /* yacc.c:1646  */
     {(yyval.info)=(yyvsp[0].info);}
-#line 2035 "y.tab.cpp" /* yacc.c:1646  */
+#line 2055 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 409 "parser.y" /* yacc.c:1646  */
+#line 424 "parser.y" /* yacc.c:1646  */
     {(yyval.info)=(yyvsp[0].info);}
-#line 2041 "y.tab.cpp" /* yacc.c:1646  */
+#line 2061 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 410 "parser.y" /* yacc.c:1646  */
+#line 425 "parser.y" /* yacc.c:1646  */
     {(yyval.info)=(yyvsp[0].info);}
-#line 2047 "y.tab.cpp" /* yacc.c:1646  */
+#line 2067 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 412 "parser.y" /* yacc.c:1646  */
+#line 427 "parser.y" /* yacc.c:1646  */
     {(yyval.info)=(yyvsp[-1].info);}
-#line 2053 "y.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 76:
-#line 414 "parser.y" /* yacc.c:1646  */
-    {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR:bool_expression '<' type error");
-                    (yyval.info)=type_bool;
-                    }
-#line 2063 "y.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 77:
-#line 420 "parser.y" /* yacc.c:1646  */
-    {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR:bool_expression '<=' type error");
-                    (yyval.info)=type_bool;
-                    }
 #line 2073 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 78:
-#line 426 "parser.y" /* yacc.c:1646  */
+  case 76:
+#line 429 "parser.y" /* yacc.c:1646  */
     {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR:bool_expression '=' type error");
-                    (yyval.info)=type_bool;
+                    // if($1!=$3)
+                    //     yyerror("ERROR:bool_expression '<' type error");
+                    // $$=type_bool;
                     }
 #line 2083 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 79:
-#line 432 "parser.y" /* yacc.c:1646  */
+  case 77:
+#line 435 "parser.y" /* yacc.c:1646  */
     {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR:bool_expression '>=' type error");
-                    (yyval.info)=type_bool;
+                    // if($1!=$3)
+                    //     yyerror("ERROR:bool_expression '<=' type error");
+                    // $$=type_bool;
                     }
 #line 2093 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 80:
-#line 438 "parser.y" /* yacc.c:1646  */
+  case 78:
+#line 441 "parser.y" /* yacc.c:1646  */
     {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR:bool_expression '>' type error");
-                    (yyval.info)=type_bool;
+                    // if($1!=$3)
+                    //     yyerror("ERROR:bool_expression '=' type error");
+                    // $$=type_bool;
                     }
 #line 2103 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 81:
-#line 444 "parser.y" /* yacc.c:1646  */
+  case 79:
+#line 447 "parser.y" /* yacc.c:1646  */
     {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR:bool_expression '!=' type error");
-                    (yyval.info)=type_bool;
+                    // if($1!=$3)
+                    //     yyerror("ERROR:bool_expression '>=' type error");
+                    // $$=type_bool;
                     }
 #line 2113 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
+  case 80:
+#line 453 "parser.y" /* yacc.c:1646  */
+    {
+                    // if($1!=$3)
+                    //     yyerror("ERROR:bool_expression '>' type error");
+                    // $$=type_bool;
+                    }
+#line 2123 "y.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 81:
+#line 459 "parser.y" /* yacc.c:1646  */
+    {
+                    // if($1!=$3)
+                    //     yyerror("ERROR:bool_expression '!=' type error");
+                    // $$=type_bool;
+                    }
+#line 2133 "y.tab.cpp" /* yacc.c:1646  */
+    break;
+
   case 82:
-#line 450 "parser.y" /* yacc.c:1646  */
+#line 465 "parser.y" /* yacc.c:1646  */
     {
-                        (yyval.info)=type_bool;
-                    }
-#line 2121 "y.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 83:
-#line 454 "parser.y" /* yacc.c:1646  */
-    {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR:bool_expression 'AND' type error");
-                    (yyval.info)=type_bool;
-                    }
-#line 2131 "y.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 84:
-#line 460 "parser.y" /* yacc.c:1646  */
-    {
-                    if((yyvsp[-2].info)!=(yyvsp[0].info))
-                        yyerror("ERROR:bool_expression 'OR' type error");
-                    (yyval.info)=type_bool;
+                        // $$=type_bool;
                     }
 #line 2141 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 85:
-#line 467 "parser.y" /* yacc.c:1646  */
+  case 83:
+#line 469 "parser.y" /* yacc.c:1646  */
     {
-                            if(s_table.lookup((yyvsp[-2].info))==0)
-                            {
-                                yyerror("ERROR: function not declare");
-                            }
-                            else if(s_table.table[(yyvsp[-2].info)].masterType!=is_func)
-                            {
-                                printf("ERROR: %s is not function\n",(yyvsp[-2].info));
-                                (yyval.info)=s_table.table[(yyvsp[-2].info)].type;
-                            }
-                            else
-                            {
-                                (yyval.info)=s_table.table[(yyvsp[-2].info)].type;
-                            }
-                        }
+                    // if($1!=$3)
+                    //     yyerror("ERROR:bool_expression 'AND' type error");
+                    // $$=type_bool;
+                    }
+#line 2151 "y.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 84:
+#line 475 "parser.y" /* yacc.c:1646  */
+    {
+                    // if($1!=$3)
+                    //     yyerror("ERROR:bool_expression 'OR' type error");
+                    // $$.info.dType=type_bool;
+                    }
 #line 2161 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 86:
-#line 483 "parser.y" /* yacc.c:1646  */
+  case 85:
+#line 482 "parser.y" /* yacc.c:1646  */
     {
-                            if(s_table.lookup((yyvsp[-4].info))==0)
-                            {
-                                printf("ERROR: function %s not declare\n",(yyvsp[-4].info));
-                            }
-                            else if(s_table.table[(yyvsp[-4].info)].masterType!=is_func)
-                            {
-                                printf("ERROR: %s is not function\n",(yyvsp[-4].info));
-                                (yyval.info)=s_table.table[(yyvsp[-4].info)].type;
-
-                            }
-                            else if(s_table.funcVarCorrect((yyvsp[-4].info),functionVariable)==0)
-                            {
-                                printf("ERROR: function %s input error\n",(yyvsp[-4].info));
-                                (yyval.info)=s_table.table[(yyvsp[-4].info)].type;
-                            }
-                            else
-                            {
-                                (yyval.info)=s_table.table[(yyvsp[-4].info)].type;
-                            }
+                            // if(s_table.lookup($1.info.tokenID)==0)
+                            // {
+                            //     yyerror("ERROR: function not declare");
+                            // }
+                            // else if(s_table.table[$1].masterType!=is_func)
+                            // {
+                            //     printf("ERROR: %s is not function\n",$1);
+                            //     $$=s_table.table[$1].type;
+                            // }
+                            // else
+                            // {
+                            //     $$=s_table.table[$1].type;
+                            // }
                         }
-#line 2187 "y.tab.cpp" /* yacc.c:1646  */
+#line 2181 "y.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 86:
+#line 498 "parser.y" /* yacc.c:1646  */
+    {
+                            // if(s_table.lookup($1)==0)
+                            // {
+                            //     printf("ERROR: function %s not declare\n",$1);
+                            // }
+                            // else if(s_table.table[$1].masterType!=is_func)
+                            // {
+                            //     printf("ERROR: %s is not function\n",$1);
+                            //     $$=s_table.table[$1].type;
+
+                            // }
+                            // else if(s_table.funcVarCorrect($1,functionVariable)==0)
+                            // {
+                            //     printf("ERROR: function %s input error\n",$1);
+                            //     $$=s_table.table[$1].type;
+                            // }
+                            // else
+                            // {
+                            //     $$=s_table.table[$1].type;
+                            // }
+                        }
+#line 2207 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 87:
-#line 506 "parser.y" /* yacc.c:1646  */
+#line 521 "parser.y" /* yacc.c:1646  */
     {
-                        funcVar temp;
-                        temp.funcVarType=intToType((yyvsp[0].info));
-                        temp.isArray=0;
-                        functionVariable.push_back(temp);
+                        // funcVar temp;
+                        // temp.funcVarType=intToType($1);
+                        // temp.isArray=0;
+                        // functionVariable.push_back(temp);
                     }
-#line 2198 "y.tab.cpp" /* yacc.c:1646  */
+#line 2218 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 88:
-#line 514 "parser.y" /* yacc.c:1646  */
+#line 529 "parser.y" /* yacc.c:1646  */
     {
-                        funcVar temp;
-                        temp.funcVarType=intToType((yyvsp[0].info));
-                        temp.isArray=0;
-                        functionVariable.push_back(temp);
+                        // funcVar temp;
+                        // temp.funcVarType=intToType($3);
+                        // temp.isArray=0;
+                        // functionVariable.push_back(temp);
                     }
-#line 2209 "y.tab.cpp" /* yacc.c:1646  */
+#line 2229 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 90:
-#line 524 "parser.y" /* yacc.c:1646  */
+#line 539 "parser.y" /* yacc.c:1646  */
     {
-                    scopeStack.push(currentStack);
-                    currentStack=++stackNumber;
-                    s_table.insertStack(scopeStack.top(),currentStack);
+                    // scopeStack.push(currentStack);
+                    // currentStack=++stackNumber;
+                    // s_table.insertStack(scopeStack.top(),currentStack);
                 }
-#line 2219 "y.tab.cpp" /* yacc.c:1646  */
+#line 2239 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 91:
-#line 533 "parser.y" /* yacc.c:1646  */
+#line 548 "parser.y" /* yacc.c:1646  */
     {
-                    if(scopeStack.empty())
-                    {
-                        currentStack=0;
-                    }
-                    else
-                    {
-                        currentStack=scopeStack.top();
-                        scopeStack.pop();
-                    }
+                    // if(scopeStack.empty())
+                    // {
+                    //     currentStack=0;
+                    // }
+                    // else
+                    // {
+                    //     currentStack=scopeStack.top();
+                    //     scopeStack.pop();
+                    // }
                 }
-#line 2235 "y.tab.cpp" /* yacc.c:1646  */
+#line 2255 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 92:
-#line 545 "parser.y" /* yacc.c:1646  */
+#line 560 "parser.y" /* yacc.c:1646  */
     {
-                    scopeStack.push(currentStack);
-                    currentStack=++stackNumber;
-                    s_table.insertStack(scopeStack.top(),currentStack);
+                    // scopeStack.push(currentStack);
+                    // currentStack=++stackNumber;
+                    // s_table.insertStack(scopeStack.top(),currentStack);
                 }
-#line 2245 "y.tab.cpp" /* yacc.c:1646  */
+#line 2265 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 93:
-#line 552 "parser.y" /* yacc.c:1646  */
+#line 567 "parser.y" /* yacc.c:1646  */
     {
-                    if(scopeStack.empty())
-                    {
-                        currentStack=0;
-                    }
-                    else
-                    {
-                        currentStack=scopeStack.top();
-                        scopeStack.pop();
-                    }
+                    // if(scopeStack.empty())
+                    // {
+                    //     currentStack=0;
+                    // }
+                    // else
+                    // {
+                    //     currentStack=scopeStack.top();
+                    //     scopeStack.pop();
+                    // }
                 }
-#line 2261 "y.tab.cpp" /* yacc.c:1646  */
+#line 2281 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 94:
-#line 565 "parser.y" /* yacc.c:1646  */
+#line 580 "parser.y" /* yacc.c:1646  */
     {
-                    scopeStack.push(currentStack);
-                    currentStack=++stackNumber;
-                    s_table.insertStack(scopeStack.top(),currentStack);
+                    // scopeStack.push(currentStack);
+                    // currentStack=++stackNumber;
+                    // s_table.insertStack(scopeStack.top(),currentStack);
 
                 }
-#line 2272 "y.tab.cpp" /* yacc.c:1646  */
+#line 2292 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 95:
-#line 573 "parser.y" /* yacc.c:1646  */
+#line 588 "parser.y" /* yacc.c:1646  */
     {
-                    if(scopeStack.empty())
-                    {
-                        currentStack=0;
-                    }
-                    else
-                    {
-                        currentStack=scopeStack.top();
-                        scopeStack.pop();
-                    }
+                    // if(scopeStack.empty())
+                    // {
+                    //     currentStack=0;
+                    // }
+                    // else
+                    // {
+                    //     currentStack=scopeStack.top();
+                    //     scopeStack.pop();
+                    // }
                 }
-#line 2288 "y.tab.cpp" /* yacc.c:1646  */
+#line 2308 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 96:
-#line 585 "parser.y" /* yacc.c:1646  */
+#line 600 "parser.y" /* yacc.c:1646  */
     {
-                    if(s_table.lookup((yyvsp[-5].info))==0)
-                    {
-                        printf("ERROR: for loop $s not found\n",(yyvsp[-5].info));
-                    }
-                    if((yyvsp[-3].info)!=(yyvsp[0].info))
-                    {
-                        printf("ERROR: for loop range error\n");
-                    }
-                    scopeStack.push(currentStack);
-                    currentStack=++stackNumber;
-                    s_table.insertStack(scopeStack.top(),currentStack);
+                    // if(s_table.lookup($2)==0)
+                    // {
+                    //     printf("ERROR: for loop $s not found\n",$2);
+                    // }
+                    // if($4!=$7)
+                    // {
+                    //     printf("ERROR: for loop range error\n");
+                    // }
+                    // scopeStack.push(currentStack);
+                    // currentStack=++stackNumber;
+                    // s_table.insertStack(scopeStack.top(),currentStack);
                 }
-#line 2306 "y.tab.cpp" /* yacc.c:1646  */
+#line 2326 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 97:
-#line 600 "parser.y" /* yacc.c:1646  */
+#line 615 "parser.y" /* yacc.c:1646  */
     {
-                    if(scopeStack.empty())
-                    {
-                        currentStack=0;
-                    }
-                    else
-                    {
-                        currentStack=scopeStack.top();
-                        scopeStack.pop();
-                    }
+                    // if(scopeStack.empty())
+                    // {
+                    //     currentStack=0;
+                    // }
+                    // else
+                    // {
+                    //     currentStack=scopeStack.top();
+                    //     scopeStack.pop();
+                    // }
                 }
-#line 2322 "y.tab.cpp" /* yacc.c:1646  */
+#line 2342 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 98:
-#line 612 "parser.y" /* yacc.c:1646  */
+#line 627 "parser.y" /* yacc.c:1646  */
     {
-                    if(s_table.lookup((yyvsp[-5].info))==0)
-                    {
-                        printf("ERROR: for loop $s not found\n",(yyvsp[-5].info));
-                    }
-                    if((yyvsp[-3].info)!=(yyvsp[0].info))
-                    {
-                        printf("ERROR: for loop range error\n");
-                    }
-                    scopeStack.push(currentStack);
-                    currentStack=++stackNumber;
-                    s_table.insertStack(scopeStack.top(),currentStack);
+                    // if(s_table.lookup($3)==0)
+                    // {
+                    //     printf("ERROR: for loop $s not found\n",$3);
+                    // }
+                    // if($5!=$8)
+                    // {
+                    //     printf("ERROR: for loop range error\n");
+                    // }
+                    // scopeStack.push(currentStack);
+                    // currentStack=++stackNumber;
+                    // s_table.insertStack(scopeStack.top(),currentStack);
                 }
-#line 2340 "y.tab.cpp" /* yacc.c:1646  */
+#line 2360 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 99:
-#line 627 "parser.y" /* yacc.c:1646  */
+#line 642 "parser.y" /* yacc.c:1646  */
     {
-                    if(scopeStack.empty())
-                    {
-                        currentStack=0;
-                    }
-                    else
-                    {
-                        currentStack=scopeStack.top();
-                        scopeStack.pop();
-                    }
+                    // if(scopeStack.empty())
+                    // {
+                    //     currentStack=0;
+                    // }
+                    // else
+                    // {
+                    //     currentStack=scopeStack.top();
+                    //     scopeStack.pop();
+                    // }
                 }
-#line 2356 "y.tab.cpp" /* yacc.c:1646  */
+#line 2376 "y.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 2360 "y.tab.cpp" /* yacc.c:1646  */
+#line 2380 "y.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2584,7 +2604,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 639 "parser.y" /* yacc.c:1906  */
+#line 654 "parser.y" /* yacc.c:1906  */
 
 
 void yyerror(char *msg)
@@ -2605,13 +2625,13 @@ int main(int argc,char **argv)
     yyin = fopen(argv[1], "r");         /* open input file */
     string fileName=argv[1];
     fileName.replace(fileName.size()-3,3,"");
-    javaASS.open(fileName+".jasm");
-    javaASS<<"class "<<fileName<<"{\nmethod public static void main(java.lang.String[])\nmax_stack 15\n max_locals 15\n{"<<endl;
+    javaASM.open(fileName+".jasm");
+    javaASM<<"class "<<fileName<<"{\nmethod public static void main(java.lang.String[])\nmax_stack 15\n max_locals 15\n{"<<endl;
 
     /* perform parsing */
     if (yyparse() == 1)                 /* parsing */
         yyerror("Parsing error !");     /* syntax error */
     s_table.dump();
-    javaASS<<"return\n}\n}"<<endl;
-    javaASS.close();
+    javaASM<<"return\n}\n}"<<endl;
+    javaASM.close();
 }
